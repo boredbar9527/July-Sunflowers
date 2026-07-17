@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" rx="28" fill="#fffaf2"/>
+  <rect x="16" y="16" width="368" height="368" rx="20" fill="#f7f1e7"/>
+  <g transform="translate(200 185)">
+    <circle r="34" fill="#eeaa2f"/>
+    <g fill="#167a58">
+      <ellipse rx="14" ry="34" cy="-52"/>
+      <ellipse rx="14" ry="34" cy="52"/>
+      <ellipse rx="34" ry="14" cx="-52"/>
+      <ellipse rx="34" ry="14" cx="52"/>
+      <ellipse rx="12" ry="28" cx="-40" cy="-40" transform="rotate(-45 -40 -40)"/>
+      <ellipse rx="12" ry="28" cx="40" cy="-40" transform="rotate(45 40 -40)"/>
+      <ellipse rx="12" ry="28" cx="-40" cy="40" transform="rotate(45 -40 40)"/>
+      <ellipse rx="12" ry="28" cx="40" cy="40" transform="rotate(-45 40 40)"/>
+    </g>
+    <circle r="26" fill="#d98e1b"/>
+  </g>
+  <text x="200" y="330" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#17352b" opacity="0.55">Product photo coming soon</text>
+</svg>

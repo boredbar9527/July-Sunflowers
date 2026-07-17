@@ -1,3 +1,6 @@
 node_modules
 dist
 .vercel
+src/data/products.json
+image-sources/
+JSF May.pdf
