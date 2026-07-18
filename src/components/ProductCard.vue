@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useCart } from "../composables/useCart.js";
-import { buildWhatsAppLink, formatPrice } from "../config.js";
+import { buildWhatsAppLink, priceLabel } from "../config.js";
 
 const props = defineProps({
   product: { type: Object, required: true }
@@ -41,7 +41,7 @@ const caseInfo = computed(() => {
       </h3>
 
       <p class="product-tile__price">
-        <strong>{{ formatPrice(product.price) ?? "Ask for pricing" }}</strong>
+        <strong>{{ priceLabel(product.price) }}</strong>
         <span v-if="caseInfo">/ case · {{ caseInfo }}</span>
       </p>
 

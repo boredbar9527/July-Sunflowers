@@ -74,3 +74,11 @@ export function formatPrice(price) {
   if (Number.isNaN(value)) return null;
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
 }
+
+// Single source of truth for how an unpriced product reads across the UI
+// (drawer, card, and table previously used three different phrasings).
+export const PRICE_FALLBACK = "Contact for pricing";
+
+export function priceLabel(price) {
+  return formatPrice(price) ?? PRICE_FALLBACK;
+}

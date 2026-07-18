@@ -1265,11 +1265,25 @@ button {
   margin: 4px 0 12px;
 }
 
+.product-drawer__mood {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+.product-drawer__cart {
+  margin-top: 24px;
+}
+
+.product-drawer__cart .qty-stepper {
+  width: fit-content;
+}
+
 .product-drawer__order {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 16px;
 }
 
 @media (max-width: 720px) {

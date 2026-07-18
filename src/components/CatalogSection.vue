@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import ProductCard from "./ProductCard.vue";
 import { useCart } from "../composables/useCart.js";
-import { buildWhatsAppLink, formatPrice } from "../config.js";
+import { buildWhatsAppLink, priceLabel } from "../config.js";
 
 const { add } = useCart();
 
@@ -180,7 +180,7 @@ function caseInfo(product) {
               </td>
               <td>{{ caseInfo(product) || "—" }}</td>
               <td class="catalog-table__price">
-                {{ formatPrice(product.price) ?? "Ask" }}
+                {{ priceLabel(product.price) }}
               </td>
               <td class="catalog-table__actions">
                 <button class="inline-button" type="button" @click="add(product.id)">

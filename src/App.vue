@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import CartDrawer from "./components/CartDrawer.vue";
 import CatalogSection from "./components/CatalogSection.vue";
 import ProductDrawer from "./components/ProductDrawer.vue";
@@ -20,6 +20,12 @@ const pointer = ref({ x: "0px", y: "0px" });
 const activeProduct = computed(
   () => products.value.find((p) => p.id === activeProductId.value) ?? null
 );
+
+// Give shared product URLs a meaningful tab/title (client-side).
+const BASE_TITLE = "July Sunflowers | Sunny Softness, Reimagined";
+watch(activeProduct, (product) => {
+  document.title = product ? `${product.name} — July Sunflowers` : BASE_TITLE;
+});
 
 const featuredId = computed(() => products.value[1]?.id ?? products.value[0]?.id);
 
