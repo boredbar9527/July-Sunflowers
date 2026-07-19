@@ -4,14 +4,32 @@ import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, buildEmailLink, priceLabel } from "../config.js";
 
 const props = defineProps({
-  product: { type: Object, default: null }
+  product: { type: Object, default: null },
+  canPrev: { type: Boolean, default: false },
+  canNext: { type: Boolean, default: false }
 });
 
-defineEmits(["close"]);
+defineEmits(["close", "prev", "next"]);
 
 const { add, setQty, qtyOf } = useCart();
 
 const inCart = computed(() => (props.product ? qtyOf(props.product.id) : 0));
+
+// Copy a shareable deep link to this product.
+const copied = ref(false);
+let copyTimer;
+async function copyLink() {
+  if (!props.product) return;
+  const url = `${window.location.origin}/product/${props.product.id}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    copied.value = true;
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => (copied.value = false), 1800);
+  } catch {
+    /* clipboard unavailable — ignore */
+  }
+}
 
 // --- Focus management ------------------------------------------------------
 // When the drawer opens we move focus to the close button and trap Tab within
@@ -23,6 +41,7 @@ let lastFocused = null;
 watch(
   () => props.product,
   async (product, previous) => {
+    copied.value = false;
     if (product && !previous) {
       lastFocused = document.activeElement;
       await nextTick();
@@ -84,6 +103,26 @@ function onKeydown(event) {
         </div>
       </div>
       <div class="product-drawer__copy">
+        <div class="product-drawer__nav">
+          <button
+            class="drawer-nav-btn"
+            type="button"
+            :disabled="!canPrev"
+            aria-label="Previous product"
+            @click="$emit('prev')"
+          >
+            ‹ Prev
+          </button>
+          <button
+            class="drawer-nav-btn"
+            type="button"
+            :disabled="!canNext"
+            aria-label="Next product"
+            @click="$emit('next')"
+          >
+            Next ›
+          </button>
+        </div>
         <p class="eyebrow">{{ product.categoryLabel }} / {{ product.sku }}</p>
         <h2 id="drawer-title">{{ product.name }}</h2>
         <p class="product-drawer__price">{{ priceLabel(product.price) }}</p>
@@ -125,6 +164,10 @@ function onKeydown(event) {
             Order via Email
           </a>
         </div>
+
+        <button class="product-drawer__copy-link" type="button" @click="copyLink">
+          {{ copied ? "✓ Link copied" : "🔗 Copy link" }}
+        </button>
       </div>
     </aside>
   </div>

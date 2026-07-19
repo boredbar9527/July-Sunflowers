@@ -565,15 +565,15 @@ button {
   overflow: hidden;
 }
 
-.category-card--facial {
+.category-card--containers {
   background:
-    radial-gradient(circle at top right, rgba(70, 156, 200, 0.18), transparent 40%),
+    radial-gradient(circle at top right, rgba(22, 122, 88, 0.18), transparent 40%),
     rgba(255, 251, 246, 0.84);
 }
 
-.category-card--bath {
+.category-card--cups {
   background:
-    radial-gradient(circle at top right, rgba(22, 122, 88, 0.18), transparent 40%),
+    radial-gradient(circle at top right, rgba(70, 156, 200, 0.18), transparent 40%),
     rgba(255, 251, 246, 0.84);
 }
 
@@ -1279,6 +1279,49 @@ button {
   width: fit-content;
 }
 
+.product-drawer__nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.drawer-nav-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.drawer-nav-btn:hover:not(:disabled) {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.drawer-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.product-drawer__copy-link {
+  margin-top: 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green-deep);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-drawer__copy-link:hover {
+  text-decoration: underline;
+}
+
 .product-drawer__order {
   display: flex;
   flex-wrap: wrap;
@@ -1339,6 +1382,7 @@ button {
 }
 
 .product-tile__media {
+  position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -1346,12 +1390,40 @@ button {
   padding: 18px;
   background: var(--surface-strong);
   cursor: pointer;
+  overflow: hidden;
 }
 
 .product-tile__media img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.product-tile:hover .product-tile__media img {
+  transform: scale(1.05);
+}
+
+.product-tile__size {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--green-deep);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 2px 8px -4px rgba(31, 46, 30, 0.5);
+  backdrop-filter: blur(2px);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-tile:hover .product-tile__media img {
+    transform: none;
+  }
 }
 
 .product-tile--sky .product-tile__media { background: #eef6fb; }
@@ -1474,6 +1546,12 @@ button {
 .catalog-table__name:hover,
 .catalog-table__name:focus-visible {
   color: var(--green-deep);
+}
+
+.catalog-table__size {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
 }
 
 .catalog-table__price {

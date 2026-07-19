@@ -1,13 +1,55 @@
 // Generates src/data/products.json from data/catalog.csv.
 // Runs automatically before `npm run dev` and `npm run build`, so the CSV
 // is the single source of truth for product data — no database needed.
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const csvPath = join(root, "data", "catalog.csv");
 const outPath = join(root, "src", "data", "products.json");
+const productImgDir = join(root, "public", "assets", "products");
+
+// A "visual family" is a group of products that look the same and differ only
+// by size (e.g. 12/16/24 oz of the same container). Dropping ONE photo named
+// <family>.jpg|png|webp into public/assets/products/ makes every product in
+// that family use it — no CSV edits, and it rolls out progressively.
+function familySlug(category, name) {
+  const s = name.toLowerCase();
+  let mat = "plastic";
+  if (s.includes("kraft")) mat = "kraft";
+  else if (s.includes("bamboo")) mat = "bamboo";
+  else if (s.includes("foam")) mat = "foam";
+  else if (s.includes("aluminum") || s.includes("foil")) mat = "foil";
+  else if (s.includes("paper") || s.includes("tissue")) mat = "paper";
+
+  let type = "item";
+  for (const k of [
+    "hinged", "clamshell", "container", "sleeve", "carrier", "t-shirt", "bag",
+    "cup", "lid", "tray", "chopstick", "fork", "spoon", "knife", "straw",
+    "napkin", "plate", "glove", "wrap", "foil", "tissue", "portion", "boat"
+  ]) {
+    if (s.includes(k)) { type = k === "t-shirt" ? "tshirt" : k; break; }
+  }
+
+  let shape = "";
+  if (s.includes("rectangular")) shape = "rect";
+  else if (s.includes("round")) shape = "round";
+  else if (s.includes("square")) shape = "square";
+
+  return [category, mat, type, shape].filter(Boolean).join("-");
+}
+
+// Return the web path to a family image if a file exists on disk, else null.
+function familyImage(category, name) {
+  const slug = familySlug(category, name);
+  for (const ext of ["jpg", "jpeg", "png", "webp", "svg"]) {
+    if (existsSync(join(productImgDir, `${slug}.${ext}`))) {
+      return `/assets/products/${slug}.${ext}`;
+    }
+  }
+  return null;
+}
 
 function parseCsv(text) {
   const rows = [];
@@ -68,17 +110,21 @@ const products = rows.map((cols, index) => {
   for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
   slugs.add(slug);
 
-  const fallback = `/assets/categories/${category}.svg`;
+  // Image priority: explicit CSV value → shared family photo (if dropped in) →
+  // category illustration as the last-resort fallback.
+  const familyImg = familyImage(category, name);
+  const fallback = familyImg || `/assets/categories/${category}.svg`;
   return {
     id: slug,
     sku,
     name,
     category,
     categoryLabel,
+    family: familySlug(category, name),
     mood: unit ? `Sold per case of ${unit}` : "",
     price: price ? Number(price) : null,
     image: image || fallback,
-    heroImage: heroImage || image || fallback,
+    heroImage: heroImage || image || familyImg || `/assets/categories/${category}.svg`,
     description: "",
     story,
     specs: unit ? [`Case: ${unit}`] : [],

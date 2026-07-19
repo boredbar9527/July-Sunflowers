@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, priceLabel } from "../config.js";
+import { sizeBadge, caseInfo } from "../utils/product.js";
 
 const props = defineProps({
   product: { type: Object, required: true }
@@ -12,11 +13,8 @@ defineEmits(["open"]);
 const { add, setQty, qtyOf } = useCart();
 
 const inCart = computed(() => qtyOf(props.product.id));
-
-const caseInfo = computed(() => {
-  const spec = props.product.specs?.[0] ?? "";
-  return spec.startsWith("Case: ") ? spec.slice(6) : spec;
-});
+const badge = computed(() => sizeBadge(props.product.name));
+const packInfo = computed(() => caseInfo(props.product));
 </script>
 
 <template>
@@ -28,6 +26,7 @@ const caseInfo = computed(() => {
       @click="$emit('open', product.id)"
     >
       <img :src="product.image" :alt="product.name" loading="lazy" />
+      <span class="product-tile__size" v-if="badge">{{ badge }}</span>
     </button>
 
     <div class="product-tile__body">
@@ -42,7 +41,7 @@ const caseInfo = computed(() => {
 
       <p class="product-tile__price">
         <strong>{{ priceLabel(product.price) }}</strong>
-        <span v-if="caseInfo">/ case · {{ caseInfo }}</span>
+        <span v-if="packInfo">/ case · {{ packInfo }}</span>
       </p>
 
       <div class="product-tile__actions">

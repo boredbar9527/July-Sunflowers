@@ -27,6 +27,21 @@ watch(activeProduct, (product) => {
   document.title = product ? `${product.name} — July Sunflowers` : BASE_TITLE;
 });
 
+// Prev/next navigation through the full catalog while the drawer is open.
+const activeIndex = computed(() =>
+  products.value.findIndex((p) => p.id === activeProductId.value)
+);
+const canPrev = computed(() => activeIndex.value > 0);
+const canNext = computed(
+  () => activeIndex.value !== -1 && activeIndex.value < products.value.length - 1
+);
+function goPrev() {
+  if (canPrev.value) openDrawer(products.value[activeIndex.value - 1].id);
+}
+function goNext() {
+  if (canNext.value) openDrawer(products.value[activeIndex.value + 1].id);
+}
+
 const featuredId = computed(() => products.value[1]?.id ?? products.value[0]?.id);
 
 const proofPoints = [
@@ -128,6 +143,10 @@ onMounted(() => {
       closeDrawer();
       closeNav();
       cartOpen.value = false;
+    }
+    if (activeProductId.value) {
+      if (event.key === "ArrowLeft") goPrev();
+      if (event.key === "ArrowRight") goNext();
     }
   });
 
@@ -271,37 +290,37 @@ onMounted(() => {
       </section>
 
       <section class="categories section">
-        <article class="category-card category-card--facial" data-reveal>
+        <article class="category-card category-card--containers" data-reveal>
           <div class="category-card__copy">
             <p class="eyebrow">Collection 01</p>
-            <h2>Facial tissue that feels light, clean, and giftable.</h2>
+            <h2>Food containers for takeout, meal prep, and the deli case.</h2>
             <p>
-              A softer brand expression for bedrooms, cars, cafes, front desks, and compact shelf
-              moments.
+              Rectangular, round, and hinged clamshells across every size — the workhorses that make
+              up the largest part of the range.
             </p>
-            <button class="inline-button" type="button" @click="selectCategory('facial')">
-              Filter facial tissue
+            <button class="inline-button" type="button" @click="selectCategory('plastic-containers')">
+              Browse containers
             </button>
           </div>
           <div class="category-card__visual">
-            <img src="/assets/introA-D1LV2l4Y.png" alt="Facial tissue display" />
+            <img src="/assets/categories/plastic-containers.svg" alt="Plastic food containers" />
           </div>
         </article>
 
-        <article class="category-card category-card--bath" data-reveal>
+        <article class="category-card category-card--cups" data-reveal>
           <div class="category-card__copy">
             <p class="eyebrow">Collection 02</p>
-            <h2>Bath tissue with a stronger, warmer household presence.</h2>
+            <h2>Cups and drinkware for hot and cold service.</h2>
             <p>
-              Built for stock-up behavior, pantry shelves, and septic-safe everyday comfort without
-              the usual warehouse aesthetic.
+              Paper hot cups, clear cold cups, lids, sleeves, and carriers — sized for cafés, juice
+              bars, and to-go counters.
             </p>
-            <button class="inline-button" type="button" @click="selectCategory('bath')">
-              Filter bath tissue
+            <button class="inline-button" type="button" @click="selectCategory('hot-cups')">
+              Browse cups &amp; drinkware
             </button>
           </div>
           <div class="category-card__visual">
-            <img src="/assets/bath-tissue-24-box-group-CognT1FQ.png" alt="Bath tissue packaging" />
+            <img src="/assets/categories/hot-cups.svg" alt="Hot and cold cups" />
           </div>
         </article>
       </section>
@@ -378,7 +397,14 @@ onMounted(() => {
       <p>Sunny softness. Pure joy.</p>
     </footer>
 
-    <ProductDrawer :product="activeProduct" @close="closeDrawer" />
+    <ProductDrawer
+      :product="activeProduct"
+      :can-prev="canPrev"
+      :can-next="canNext"
+      @close="closeDrawer"
+      @prev="goPrev"
+      @next="goNext"
+    />
     <CartDrawer :open="cartOpen" :products="products" @close="cartOpen = false" />
   </div>
 </template>

@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import ProductCard from "./ProductCard.vue";
 import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, priceLabel } from "../config.js";
+import { sizeBadge, caseInfo } from "../utils/product.js";
 
 const { add } = useCart();
 
@@ -72,10 +73,6 @@ function goTo(next) {
   document.querySelector("#collections")?.scrollIntoView({ behavior: "smooth" });
 }
 
-function caseInfo(product) {
-  const spec = product.specs?.[0] ?? "";
-  return spec.startsWith("Case: ") ? spec.slice(6) : spec;
-}
 </script>
 
 <template>
@@ -161,6 +158,7 @@ function caseInfo(product) {
             <tr>
               <th>SKU</th>
               <th>Product</th>
+              <th>Size</th>
               <th>Case</th>
               <th>Price</th>
               <th><span class="visually-hidden">Actions</span></th>
@@ -178,6 +176,7 @@ function caseInfo(product) {
                   {{ product.name }}
                 </button>
               </td>
+              <td class="catalog-table__size">{{ sizeBadge(product.name) || "—" }}</td>
               <td>{{ caseInfo(product) || "—" }}</td>
               <td class="catalog-table__price">
                 {{ priceLabel(product.price) }}
