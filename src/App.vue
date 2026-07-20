@@ -6,8 +6,21 @@ import ProductDrawer from "./components/ProductDrawer.vue";
 import { useCart } from "./composables/useCart.js";
 import { useCatalog } from "./composables/useCatalog.js";
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "./config.js";
+import { groupCategories } from "./utils/categories.js";
+import { CATEGORY_COPY } from "./data/categories.js";
 
 const { products, source } = useCatalog();
+
+// One "Collection NN" entry per product category (original-site card
+// language), shown as an accordion: headers first, products on demand.
+const collections = computed(() =>
+  groupCategories(products.value).map((cat, i) => ({
+    ...cat,
+    number: String(i + 1).padStart(2, "0"),
+    headline: CATEGORY_COPY[cat.key]?.headline ?? cat.label
+  }))
+);
+
 const { count: cartCount } = useCart();
 
 const filter = ref("all");
@@ -290,37 +303,23 @@ onMounted(() => {
       </section>
 
       <section class="categories section">
-        <article class="category-card category-card--containers" data-reveal>
+        <article
+          class="category-card category-card--dynamic"
+          :class="`category-card--tint-${col.accent}`"
+          data-reveal
+          v-for="col in collections"
+          :key="col.key"
+        >
           <div class="category-card__copy">
-            <p class="eyebrow">Collection 01</p>
-            <h2>Food containers for takeout, meal prep, and the deli case.</h2>
-            <p>
-              Rectangular, round, and hinged clamshells across every size — the workhorses that make
-              up the largest part of the range.
-            </p>
-            <button class="inline-button" type="button" @click="selectCategory('plastic-containers')">
-              Browse containers
+            <p class="eyebrow">Collection {{ col.number }}</p>
+            <h2>{{ col.headline }}</h2>
+            <p>{{ col.description }}</p>
+            <button class="inline-button" type="button" @click="selectCategory(col.key)">
+              Browse {{ col.label }}
             </button>
           </div>
           <div class="category-card__visual">
-            <img src="/assets/categories/plastic-containers.svg" alt="Plastic food containers" />
-          </div>
-        </article>
-
-        <article class="category-card category-card--cups" data-reveal>
-          <div class="category-card__copy">
-            <p class="eyebrow">Collection 02</p>
-            <h2>Cups and drinkware for hot and cold service.</h2>
-            <p>
-              Paper hot cups, clear cold cups, lids, sleeves, and carriers — sized for cafés, juice
-              bars, and to-go counters.
-            </p>
-            <button class="inline-button" type="button" @click="selectCategory('hot-cups')">
-              Browse cups &amp; drinkware
-            </button>
-          </div>
-          <div class="category-card__visual">
-            <img src="/assets/categories/hot-cups.svg" alt="Hot and cold cups" />
+            <img :src="`/assets/categories/${col.key}.svg`" :alt="col.label" loading="lazy" />
           </div>
         </article>
       </section>

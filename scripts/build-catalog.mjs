@@ -70,10 +70,18 @@ const products = rows.map((cols, index) => {
   for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
   slugs.add(slug);
 
-  // Image priority: explicit CSV value → shared family photo (if dropped in) →
+  // Image priority: explicit CSV value → per-SKU photo (dropped into
+  // public/assets/products/sku/<slug>.<ext>) → shared family photo →
   // category illustration as the last-resort fallback.
+  let skuImg = null;
+  for (const ext of ["png", "jpg", "jpeg", "webp"]) {
+    if (existsSync(join(productImgDir, "sku", `${slug}.${ext}`))) {
+      skuImg = `/assets/products/sku/${slug}.${ext}`;
+      break;
+    }
+  }
   const familyImg = familyImage(category, name);
-  const fallback = familyImg || `/assets/categories/${category}.svg`;
+  const fallback = skuImg || familyImg || `/assets/categories/${category}.svg`;
   return {
     id: slug,
     sku,
@@ -84,7 +92,7 @@ const products = rows.map((cols, index) => {
     mood: unit ? `Sold per case of ${unit}` : "",
     price: price ? Number(price) : null,
     image: image || fallback,
-    heroImage: heroImage || image || familyImg || `/assets/categories/${category}.svg`,
+    heroImage: heroImage || image || skuImg || familyImg || `/assets/categories/${category}.svg`,
     description: "",
     story,
     specs: unit ? [`Case: ${unit}`] : [],

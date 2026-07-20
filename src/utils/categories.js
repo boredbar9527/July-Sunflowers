@@ -23,7 +23,11 @@ export function groupCategories(products) {
   }
 
   return [...byKey.entries()].map(([key, items], index) => {
-    const photo = items.find((p) => hasPhoto(p.image));
+    // Per-SKU photos are for the small tiles only — big category cards get
+    // dedicated imagery later.
+    const photo = items.find(
+      (p) => hasPhoto(p.image) && !p.image.startsWith("/assets/products/sku/")
+    );
     const familyCount = new Set(items.map((p) => p.family)).size;
     return {
       key,

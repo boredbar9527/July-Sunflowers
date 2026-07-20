@@ -80,7 +80,11 @@ export function groupFamilies(products) {
   return [...byKey.entries()].map(([key, items], index) => {
     const copy = FAMILY_COPY[key];
     const title = copy?.title ?? autoTitle(items);
-    const photo = items.find((p) => hasPhoto(p.image));
+    // Per-SKU photos are for the small tiles only — the big type cards get
+    // their own dedicated imagery later, so skip sku shots here.
+    const photo = items.find(
+      (p) => hasPhoto(p.image) && !p.image.startsWith("/assets/products/sku/")
+    );
 
     // Chip labels, with the SKU appended when two variants would otherwise
     // read identically (e.g. two different 24 oz lids).

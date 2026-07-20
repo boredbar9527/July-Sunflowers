@@ -577,6 +577,141 @@ button {
     rgba(255, 251, 246, 0.84);
 }
 
+/* --- Collections accordion ---
+   17 categories would make a very tall page as full cards, so the list
+   shows compact headers first; a category's products expand on click. */
+
+.collections-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 40px 0 24px;
+}
+
+.collection-acc {
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 26px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.collection-acc__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+}
+
+.collection-acc__head:hover .collection-acc__title,
+.collection-acc__head:focus-visible .collection-acc__title {
+  color: var(--green-deep);
+}
+
+.collection-acc__icon {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex: none;
+}
+
+.collection-acc__text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.collection-acc__text .eyebrow {
+  margin: 0;
+  font-size: 0.66rem;
+}
+
+.collection-acc__title {
+  font-family: "July Bloom", sans-serif;
+  font-weight: 400;
+  font-size: 1.65rem;
+  line-height: 1;
+  transition: color 160ms ease;
+}
+
+.collection-acc__chevron {
+  margin-left: auto;
+  color: var(--green-deep);
+  font-size: 1.1rem;
+  transition: transform 220ms ease;
+}
+
+.collection-acc.is-open .collection-acc__chevron {
+  transform: rotate(180deg);
+}
+
+.collection-acc__body {
+  padding: 4px 24px 26px;
+}
+
+.collection-acc__headline {
+  margin: 0 0 8px;
+  font-family: "July Bloom", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+  line-height: 1.02;
+}
+
+.collection-acc__desc {
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  max-width: 62ch;
+  line-height: 1.6;
+}
+
+/* With 17 dynamic collections the headlines run longer than the two
+   originals — cap the display size so every word stays inside the card. */
+.category-card--dynamic {
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 32%);
+}
+
+.category-card--dynamic h2 {
+  font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+  overflow-wrap: break-word;
+}
+
+.category-card--dynamic .category-card__visual img {
+  max-height: 240px;
+}
+
+/* Rotating tints for the dynamic per-category collection cards. */
+.category-card--tint-sky {
+  background:
+    radial-gradient(circle at top right, rgba(70, 156, 200, 0.18), transparent 40%),
+    rgba(255, 251, 246, 0.84);
+}
+
+.category-card--tint-leaf {
+  background:
+    radial-gradient(circle at top right, rgba(22, 122, 88, 0.18), transparent 40%),
+    rgba(255, 251, 246, 0.84);
+}
+
+.category-card--tint-sand {
+  background:
+    radial-gradient(circle at top right, rgba(212, 186, 147, 0.3), transparent 40%),
+    rgba(255, 251, 246, 0.84);
+}
+
+.category-card--tint-sun {
+  background:
+    radial-gradient(circle at top right, rgba(238, 170, 47, 0.2), transparent 40%),
+    rgba(255, 251, 246, 0.84);
+}
+
 .category-card__copy p {
   margin: 18px 0 0;
 }
@@ -1235,6 +1370,13 @@ button {
   text-align: center;
 }
 
+.catalog-prompt {
+  color: var(--ink-soft);
+  padding: 40px 0;
+  text-align: center;
+  font-size: 1.02rem;
+}
+
 .pagination {
   display: flex;
   flex-wrap: wrap;
@@ -1433,10 +1575,15 @@ button {
   }
 }
 
-.product-tile--sky .product-tile__media { background: #eef6fb; }
-.product-tile--leaf .product-tile__media { background: #edf6f0; }
-.product-tile--sand .product-tile__media { background: #f8f1e4; }
-.product-tile--sun .product-tile__media { background: #fbf3e0; }
+/* One clean surface behind every product image, regardless of accent, so
+   the mixed photo backgrounds read as a single consistent system. */
+.product-tile__media,
+.product-tile--sky .product-tile__media,
+.product-tile--leaf .product-tile__media,
+.product-tile--sand .product-tile__media,
+.product-tile--sun .product-tile__media {
+  background: #fff;
+}
 
 .product-tile__body {
   display: flex;
