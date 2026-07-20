@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "catalog": "node scripts/build-catalog.mjs",
+    "admin": "node scripts/admin-server.mjs",
     "dev": "npm run catalog && vite",
     "build": "npm run catalog && vite build",
     "preview": "vite preview"
