@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, priceLabel } from "../config.js";
-import { sizeBadge, caseInfo } from "../utils/product.js";
+import { sizeBadge, caseInfo, hasPhoto } from "../utils/product.js";
 
 const props = defineProps({
   product: { type: Object, required: true }
@@ -15,6 +15,8 @@ const { add, setQty, qtyOf } = useCart();
 const inCart = computed(() => qtyOf(props.product.id));
 const badge = computed(() => sizeBadge(props.product.name));
 const packInfo = computed(() => caseInfo(props.product));
+const photo = computed(() => hasPhoto(props.product.image));
+const artTitle = computed(() => badge.value || props.product.categoryLabel);
 </script>
 
 <template>
@@ -25,8 +27,15 @@ const packInfo = computed(() => caseInfo(props.product));
       :aria-label="`View details for ${product.name}`"
       @click="$emit('open', product.id)"
     >
-      <img :src="product.image" :alt="product.name" loading="lazy" />
-      <span class="product-tile__size" v-if="badge">{{ badge }}</span>
+      <img v-if="photo" :src="product.image" :alt="product.name" loading="lazy" />
+      <span v-else class="product-tile__art" aria-hidden="true">
+        <span class="product-tile__art-brand">July Sunflowers</span>
+        <strong class="product-tile__art-title" :class="{ 'is-long': artTitle.length > 9 }">
+          {{ artTitle }}
+        </strong>
+        <span class="product-tile__art-sub" v-if="packInfo">case · {{ packInfo }}</span>
+      </span>
+      <span class="product-tile__size" v-if="badge && photo">{{ badge }}</span>
     </button>
 
     <div class="product-tile__body">
@@ -64,7 +73,7 @@ const packInfo = computed(() => caseInfo(props.product));
           target="_blank"
           rel="noopener"
         >
-          or order via WhatsApp
+          WhatsApp
         </a>
       </div>
     </div>

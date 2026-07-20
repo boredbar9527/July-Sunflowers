@@ -2,6 +2,7 @@
 import { computed, nextTick, ref, watch } from "vue";
 import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, buildEmailLink, priceLabel } from "../config.js";
+import { sizeBadge, hasPhoto } from "../utils/product.js";
 
 const props = defineProps({
   product: { type: Object, default: null },
@@ -14,6 +15,10 @@ defineEmits(["close", "prev", "next"]);
 const { add, setQty, qtyOf } = useCart();
 
 const inCart = computed(() => (props.product ? qtyOf(props.product.id) : 0));
+const heroPhoto = computed(() => hasPhoto(props.product?.heroImage));
+const artTitle = computed(
+  () => sizeBadge(props.product?.name ?? "") || props.product?.categoryLabel || ""
+);
 
 // Copy a shareable deep link to this product.
 const copied = ref(false);
@@ -99,7 +104,12 @@ function onKeydown(event) {
       </button>
       <div class="product-drawer__media">
         <div class="product-drawer__media-card">
-          <img :src="product.heroImage" :alt="product.name" />
+          <img v-if="heroPhoto" :src="product.heroImage" :alt="product.name" />
+          <div v-else class="product-drawer__art" aria-hidden="true">
+            <span class="product-tile__art-brand">July Sunflowers</span>
+            <strong class="product-drawer__art-title">{{ artTitle }}</strong>
+            <span class="product-drawer__art-sub">{{ product.name }}</span>
+          </div>
         </div>
       </div>
       <div class="product-drawer__copy">

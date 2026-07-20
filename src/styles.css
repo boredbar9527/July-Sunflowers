@@ -952,6 +952,13 @@ button {
   padding: 28px 14px 14px 6px;
 }
 
+/* Catalog names run long ("30 oz Plastic Food Container with Lid (2
+   Compartment)") — cap the display size so they wrap inside the panel. */
+.product-drawer__copy h2 {
+  font-size: clamp(2rem, 3.4vw, 2.9rem);
+  overflow-wrap: anywhere;
+}
+
 .product-drawer__story,
 .product-drawer__description {
   margin-top: 18px;
@@ -1485,13 +1492,294 @@ button {
 
 .product-tile__actions {
   margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .product-tile__order {
-  width: 100%;
+  padding: 9px 16px;
+  font-size: 0.82rem;
+}
+
+/* --- Typographic art tiles (products without photography) ---
+   Instead of repeating the same category illustration across dozens of
+   tiles, unphotographed products get a designed type treatment: the size
+   is the hero, set in the brand font over a soft accent glow. */
+
+.product-tile__art {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
   text-align: center;
-  padding: 10px 14px;
+}
+
+.product-tile__art::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 76%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -52%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 170, 47, 0.26), transparent 66%);
+}
+
+.product-tile--sky .product-tile__art::before {
+  background: radial-gradient(circle, rgba(70, 156, 200, 0.24), transparent 66%);
+}
+
+.product-tile--leaf .product-tile__art::before {
+  background: radial-gradient(circle, rgba(22, 122, 88, 0.2), transparent 66%);
+}
+
+.product-tile--sand .product-tile__art::before {
+  background: radial-gradient(circle, rgba(212, 186, 147, 0.34), transparent 66%);
+}
+
+.product-tile__art > * {
+  position: relative;
+}
+
+.product-tile__art-brand {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.product-tile__art-title {
+  font-family: "July Bloom", sans-serif;
+  font-weight: 400;
+  font-size: 2.7rem;
+  line-height: 0.95;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.product-tile__art-title.is-long {
+  font-size: 1.5rem;
+  line-height: 1.1;
+}
+
+.product-tile__art-sub {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
+.product-drawer__art {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.product-drawer__art::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70%;
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -52%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 170, 47, 0.24), transparent 66%);
+}
+
+.product-drawer__art > * {
+  position: relative;
+}
+
+.product-drawer__art-title {
+  font-family: "July Bloom", sans-serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 4rem);
+  line-height: 0.95;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.product-drawer__art-sub {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  max-width: 26ch;
+  line-height: 1.5;
+}
+
+/* --- Family (product-type) cards ---
+   One editorial card per product family, in the original site's card
+   language: eyebrow meta, display title, description, and the sizes as
+   clickable chips. Wide cards (6+ sizes) create the original's rhythm. */
+
+.product-grid--families {
+  grid-auto-flow: dense;
+}
+
+.family-card__sizes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.family-card__chip {
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.88rem;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+.family-card__chip:hover,
+.family-card__chip:focus-visible {
+  transform: translateY(-2px);
+  background: #fff;
+  border-color: rgba(22, 122, 88, 0.45);
+  color: var(--green-deep);
+}
+
+.family-card__art {
+  position: relative;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+  min-height: 180px;
+}
+
+.family-card__art::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(220px, 82%);
+  aspect-ratio: 1 / 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(238, 170, 47, 0.24), transparent 66%);
+}
+
+.product-card--sky .family-card__art::before {
+  background: radial-gradient(circle, rgba(70, 156, 200, 0.22), transparent 66%);
+}
+
+.product-card--leaf .family-card__art::before {
+  background: radial-gradient(circle, rgba(22, 122, 88, 0.18), transparent 66%);
+}
+
+.product-card--sand .family-card__art::before {
+  background: radial-gradient(circle, rgba(212, 186, 147, 0.32), transparent 66%);
+}
+
+.family-card__art > * {
+  position: relative;
+}
+
+.family-card__art-title {
+  font-family: "July Bloom", sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 0.95;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  max-width: 100%;
+}
+
+/* Word-based art (category labels) needs a smaller size than numeric
+   ranges so long words like "Accessories" stay inside the card. */
+.family-card__art-title--label {
+  font-size: clamp(1.3rem, 1.8vw, 1.8rem);
+  line-height: 1.05;
+}
+
+.product-card__meta strong {
+  color: var(--ink-soft);
   font-size: 0.85rem;
+}
+
+/* --- Collection cards (shop options "Grid" and "Sections") ---
+   NOTE: named collection-card because .category-card is already taken by
+   the two hero collection panels higher up the page. */
+
+.collection-card {
+  width: 100%;
+}
+
+button.collection-card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+button.collection-card .product-card__meta {
+  display: flex;
+}
+
+button.collection-card:hover,
+button.collection-card:focus-visible {
+  transform: translateY(-6px);
+  box-shadow: 0 38px 90px rgba(22, 51, 42, 0.17);
+}
+
+.collection-card__cta {
+  margin-top: 18px;
+  display: inline-block;
+}
+
+.category-door-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* .product-card carries a span for the 12-col product grid; inside the
+   2-col door grid each card takes exactly one cell. */
+.category-door-grid > .collection-card {
+  grid-column: auto;
+}
+
+@media (max-width: 1080px) {
+  .category-door-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.category-hero {
+  margin-bottom: 18px;
+}
+
+.category-hero .product-card__visual img {
+  max-height: 220px;
+}
+
+.category-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.category-section .product-tile-grid {
+  margin-top: 14px;
 }
 
 .catalog-table-wrap {
@@ -1603,10 +1891,8 @@ button {
 }
 
 .product-tile__wa {
-  display: block;
-  margin-top: 8px;
   font-size: 0.78rem;
-  text-align: center;
+  white-space: nowrap;
 }
 
 .qty-stepper {
@@ -1643,7 +1929,7 @@ button {
 }
 
 .qty-stepper--tile {
-  width: 100%;
+  flex: 1;
   justify-content: space-between;
 }
 

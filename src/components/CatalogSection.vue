@@ -1,9 +1,13 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import ProductCard from "./ProductCard.vue";
+import ProductFamilyCard from "./ProductFamilyCard.vue";
+import CategoryCard from "./CategoryCard.vue";
 import { useCart } from "../composables/useCart.js";
 import { buildWhatsAppLink, priceLabel } from "../config.js";
 import { sizeBadge, caseInfo } from "../utils/product.js";
+import { groupFamilies } from "../utils/families.js";
+import { groupCategories } from "../utils/categories.js";
 
 const { add } = useCart();
 
@@ -14,10 +18,17 @@ const props = defineProps({
 
 const emit = defineEmits(["open", "update:filter"]);
 
-const PAGE_SIZE = 24;
+const PAGE_SIZE = 24; // product tiles / list rows per page
+const FAMILY_PAGE_SIZE = 12; // family cards per page
 const search = ref("");
 const page = ref(1);
-const view = ref("grid"); // "grid" | "list"
+
+// Three client-facing catalog presentations plus the utilitarian list:
+// "grid"     — big card for the chosen category, product tiles below (B1)
+// "sections" — every category as a big card + its tiles, in sequence (B2)
+// "types"    — one editorial card per product family with size chips (A)
+// "list"     — SKU table for fast ordering
+const view = ref("grid");
 
 const categories = computed(() => {
   const map = new Map();
@@ -39,10 +50,44 @@ const filtered = computed(() => {
   });
 });
 
-const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE)));
+const families = computed(() => groupFamilies(filtered.value));
+const categoryGroups = computed(() => groupCategories(filtered.value));
+
+// The single hero card shown in grid view once a category is chosen.
+const activeCategory = computed(() =>
+  props.filter === "all"
+    ? null
+    : categoryGroups.value.find((c) => c.key === props.filter) ?? null
+);
+
+const totalPages = computed(() => {
+  if (view.value === "types") {
+    return Math.max(1, Math.ceil(families.value.length / FAMILY_PAGE_SIZE));
+  }
+  if (view.value === "sections") return 1;
+  if (view.value === "grid" && props.filter === "all") return 1;
+  return Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE));
+});
+
 const paged = computed(() => {
   const start = (page.value - 1) * PAGE_SIZE;
   return filtered.value.slice(start, start + PAGE_SIZE);
+});
+
+const pagedFamilies = computed(() => {
+  const start = (page.value - 1) * FAMILY_PAGE_SIZE;
+  return families.value.slice(start, start + FAMILY_PAGE_SIZE);
+});
+
+const countText = computed(() => {
+  const products = `${filtered.value.length} size${filtered.value.length === 1 ? "" : "s"}`;
+  if (view.value === "types") {
+    return `${families.value.length} product type${families.value.length === 1 ? "" : "s"} · ${products}`;
+  }
+  if (view.value === "list") {
+    return `${filtered.value.length} product${filtered.value.length === 1 ? "" : "s"}`;
+  }
+  return `${categoryGroups.value.length} collection${categoryGroups.value.length === 1 ? "" : "s"} · ${products}`;
 });
 
 const pageNumbers = computed(() => {
@@ -64,6 +109,10 @@ watch(
   }
 );
 
+watch(view, () => {
+  page.value = 1;
+});
+
 function setFilter(value) {
   emit("update:filter", value);
 }
@@ -72,7 +121,6 @@ function goTo(next) {
   page.value = Math.min(Math.max(1, next), totalPages.value);
   document.querySelector("#collections")?.scrollIntoView({ behavior: "smooth" });
 }
-
 </script>
 
 <template>
@@ -117,9 +165,7 @@ function goTo(next) {
     </div>
 
     <div class="catalog-bar">
-      <p class="catalog-count" aria-live="polite">
-        {{ filtered.length }} product{{ filtered.length === 1 ? "" : "s" }}
-      </p>
+      <p class="catalog-count" aria-live="polite">{{ countText }}</p>
       <div class="view-toggle" role="tablist" aria-label="Catalog view">
         <button
           class="filter-pill"
@@ -129,6 +175,24 @@ function goTo(next) {
           @click="view = 'grid'"
         >
           ▦ Grid
+        </button>
+        <button
+          class="filter-pill"
+          :class="{ 'is-active': view === 'sections' }"
+          type="button"
+          :aria-pressed="String(view === 'sections')"
+          @click="view = 'sections'"
+        >
+          ◫ Sections
+        </button>
+        <button
+          class="filter-pill"
+          :class="{ 'is-active': view === 'types' }"
+          type="button"
+          :aria-pressed="String(view === 'types')"
+          @click="view = 'types'"
+        >
+          ✦ Types
         </button>
         <button
           class="filter-pill"
@@ -142,12 +206,54 @@ function goTo(next) {
       </div>
     </div>
 
-    <template v-if="paged.length">
-      <div class="product-tile-grid" v-if="view === 'grid'">
-        <ProductCard
-          v-for="product in paged"
-          :key="product.id"
-          :product="product"
+    <template v-if="filtered.length">
+      <!-- B1: category doors when "All"; hero card + tiles once chosen -->
+      <template v-if="view === 'grid'">
+        <div class="category-door-grid" v-if="!activeCategory">
+          <CategoryCard
+            v-for="cat in categoryGroups"
+            :key="cat.key"
+            :category="cat"
+            interactive
+            @select="setFilter($event)"
+          />
+        </div>
+        <template v-else>
+          <div class="category-hero">
+            <CategoryCard :category="activeCategory" />
+          </div>
+          <div class="product-tile-grid">
+            <ProductCard
+              v-for="product in paged"
+              :key="product.id"
+              :product="product"
+              @open="$emit('open', $event)"
+            />
+          </div>
+        </template>
+      </template>
+
+      <!-- B2: every category as a big card followed by its tiles -->
+      <div class="category-sections" v-else-if="view === 'sections'">
+        <div class="category-section" v-for="cat in categoryGroups" :key="cat.key">
+          <CategoryCard :category="cat" />
+          <div class="product-tile-grid">
+            <ProductCard
+              v-for="product in cat.items"
+              :key="product.id"
+              :product="product"
+              @open="$emit('open', $event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- A: one editorial card per product family -->
+      <div class="product-grid product-grid--families" v-else-if="view === 'types'">
+        <ProductFamilyCard
+          v-for="fam in pagedFamilies"
+          :key="fam.key"
+          :family="fam"
           @open="$emit('open', $event)"
         />
       </div>

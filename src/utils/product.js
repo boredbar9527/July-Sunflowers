@@ -37,6 +37,13 @@ export function sizeBadge(name = "") {
   return null;
 }
 
+// True when the src is a real product photo rather than the generic category
+// illustration fallback — the fallback should get the typographic treatment,
+// not be shown as if it were photography.
+export function hasPhoto(src = "") {
+  return !!src && !src.startsWith("/assets/categories/");
+}
+
 // The pack/case descriptor, e.g. "80 pcs" from a "Case: 80 pcs" spec.
 export function caseInfo(product) {
   const spec = product?.specs?.[0] ?? "";
