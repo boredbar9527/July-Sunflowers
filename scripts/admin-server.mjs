@@ -22,7 +22,7 @@ const PORT = 5174;
 
 // Contact/biodata fields the admin is allowed to edit.
 const SETTINGS_FIELDS = [
-  "contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address", "web3formsKey"
+  "contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address"
 ];
 
 const execFileAsync = promisify(execFile);

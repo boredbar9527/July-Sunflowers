@@ -10,11 +10,6 @@ export const CONTACT_PHONE_TEL = settings.phoneTel;       // for tel: links
 export const STORE_ADDRESS = settings.address;
 export const STORE_LOGO = "/assets/logo-LCTJEtBP.png";
 
-// Web3Forms access key — editable in the admin (Store info). The order email is
-// delivered to whatever inbox that key is registered to at web3forms.com. When
-// empty, sendOrder() falls back to opening the customer's email app (mailto).
-export const WEB3FORMS_ACCESS_KEY = settings.web3formsKey || "";
-
 export function buildWhatsAppLink(product) {
   const lines = [
     "Hello July Sunflowers, I would like to order:",
@@ -31,10 +26,9 @@ export function buildEmailLink(product) {
   return `mailto:${ORDER_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-// --- Order / invoice (frontend only) -------------------------------------
-// The email transport is intentionally pluggable: sendOrder() currently
-// composes a mailto: draft. When the client picks a service (Web3Forms,
-// EmailJS, serverless endpoint, ...), only this function needs to change.
+// --- Order / invoice ------------------------------------------------------
+// Orders are emailed by the serverless /api/order function via Resend; see
+// sendOrder() below. If that fails, it falls back to a mailto: draft.
 
 export function nextOrderNumber() {
   const now = new Date();

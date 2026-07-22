@@ -151,10 +151,6 @@
       <div><label>Phone — call link (digits only, e.g. +19098283565)</label><input id="s-phoneTel"></div>
       <div><label>WhatsApp number (digits, country code first)</label><input id="s-whatsappNumber"></div>
       <div class="full"><label>Address</label><input id="s-address"></div>
-      <div class="full">
-        <label>Web3Forms access key — makes orders auto-email (get one free at web3forms.com; empty = customer's email app opens instead)</label>
-        <input id="s-web3formsKey" placeholder="e.g. 7532ea34-9704-…">
-      </div>
     </div>
     <div style="margin-top:14px">
       <button class="primary" id="settings-save">Save store info</button>
@@ -659,7 +655,7 @@ $("promo-save").addEventListener("click", async () => {
 });
 
 // --- store info / contact settings ---
-const SETTINGS_KEYS = ["contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address", "web3formsKey"];
+const SETTINGS_KEYS = ["contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address"];
 async function loadSettings() {
   const s = await api("/api/settings");
   for (const k of SETTINGS_KEYS) {
