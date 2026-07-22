@@ -32,16 +32,14 @@ Orders placed on the website are emailed to you automatically through **Resend**
    ORDER_FROM=July Sunflowers <onboarding@resend.dev>
    ```
    > This `.env` file is secret and is NOT uploaded to GitHub. Do not share it publicly.
-4. Start the **storefront**:
+4. Start **both** the storefront and admin panel with one command:
    ```
-   npm run dev
+   npm start
    ```
-   Open **http://localhost:5173**
-5. Start the **admin panel** (to manage the catalog) — open a new terminal:
-   ```
-   npm run admin
-   ```
-   Open **http://localhost:5174**
+   - Storefront → **http://localhost:5173**
+   - Admin panel → **http://localhost:5174**
+
+   > Prefer separate terminals? Run `npm run dev` (storefront) and `npm run admin` (admin) individually instead.
 
 **Test an order:** at http://localhost:5173 → add products to the cart → fill in the form → "Send order via email" → check your store inbox (you should receive a Purchase Order email with a PDF attachment).
 
