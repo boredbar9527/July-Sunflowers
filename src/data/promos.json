@@ -1,0 +1,37 @@
+{
+  "dept-takeout": {
+    "label": "Take-Out & Delivery",
+    "title": "Packaging that travels well",
+    "text": "Hinged containers, deli cups, kraft boxes and sushi trays — every to-go format, case-ready.",
+    "cta": "Shop Take-Out & Delivery",
+    "banner": "/assets/promos/takeout-containers.png"
+  },
+  "dept-drinkware": {
+    "label": "Cups, Lids & Straws",
+    "title": "Cups for every drink you pour",
+    "text": "Hot cups, cold cups, portion cups and straws — matched lids in stock.",
+    "cta": "Shop Cups, Lids & Straws",
+    "banner": "/assets/promos/cups.png"
+  },
+  "dept-tabletop": {
+    "label": "Tabletop & Serving",
+    "title": "Set the table, front of house",
+    "text": "Plates, cutlery and napkins that make service feel finished.",
+    "cta": "Shop Tabletop & Serving",
+    "banner": "/assets/promos/tabletop-cutlery.png"
+  },
+  "dept-bags-wrap": {
+    "label": "Bags & Wrap",
+    "title": "Carry it out, wrap it up",
+    "text": "T-shirt bags, paper bags, foil and cling wrap for prep and pickup.",
+    "cta": "Shop Bags & Wrap",
+    "banner": "/assets/promos/bags.png"
+  },
+  "dept-janitorial": {
+    "label": "Janitorial & Safety",
+    "title": "Clean, safe, well-stocked",
+    "text": "Gloves, tissue and back-of-house supplies to keep the day running.",
+    "cta": "Shop Janitorial & Safety",
+    "banner": "/assets/promos/tissue-hygiene.png"
+  }
+}

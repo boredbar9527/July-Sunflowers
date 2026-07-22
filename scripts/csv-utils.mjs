@@ -1,7 +1,8 @@
 // Shared CSV helpers for the catalog tooling (build script + local admin).
 // The catalog CSV always uses the header below; keep it in one place.
 export const CATALOG_HEADER = [
-  "sku", "name", "category", "category_label", "unit", "price", "image", "hero_image", "story"
+  "sku", "name", "category", "category_label", "unit", "price",
+  "image", "hero_image", "story", "badge", "hover_image"
 ];
 
 export function parseCsv(text) {

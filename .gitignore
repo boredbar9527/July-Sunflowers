@@ -1,6 +1,15 @@
 node_modules
 dist
 .vercel
+.env
+.env.*
+!.env.example
 src/data/products.json
 image-sources/
-JSF May.pdf
+
+# Scratch / source files that shouldn't ship
+scratch_*.log
+*.make
+JSF*.pdf
+/tes1_iklan*.webp
+/image*.png

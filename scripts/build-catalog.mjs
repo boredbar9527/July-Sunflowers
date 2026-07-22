@@ -54,7 +54,7 @@ function familyImage(category, name) {
 
 const rows = parseCsv(readFileSync(csvPath, "utf8"));
 const header = rows.shift();
-const expected = "sku,name,category,category_label,unit,price,image,hero_image,story";
+const expected = "sku,name,category,category_label,unit,price,image,hero_image,story,badge,hover_image";
 if (header.join(",") !== expected) {
   throw new Error(`Unexpected CSV header: ${header.join(",")}`);
 }
@@ -63,17 +63,25 @@ const accents = ["sky", "leaf", "sand", "sun"];
 const slugs = new Set();
 
 const products = rows.map((cols, index) => {
-  const [sku, name, category, categoryLabel, unit, price, image, heroImage, story] = cols;
+  const [sku, name, category, categoryLabel, unit, price, image, heroImage, story, badge, hoverImage] = cols;
 
   let slug = sku.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "item";
   const base = slug;
   for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
   slugs.add(slug);
 
-  // Image priority: explicit CSV value → shared family photo (if dropped in) →
-  // category illustration as the last-resort fallback.
+  // Image priority: explicit CSV value → per-SKU photo (dropped into
+  // public/assets/products/sku/<slug>.<ext> by sync-sku-images.mjs) → shared
+  // family photo → category illustration as the last-resort fallback.
+  let skuImg = null;
+  for (const ext of ["png", "jpg", "jpeg", "webp"]) {
+    if (existsSync(join(productImgDir, "sku", `${slug}.${ext}`))) {
+      skuImg = `/assets/products/sku/${slug}.${ext}`;
+      break;
+    }
+  }
   const familyImg = familyImage(category, name);
-  const fallback = familyImg || `/assets/categories/${category}.svg`;
+  const fallback = skuImg || familyImg || `/assets/categories/${category}.svg`;
   return {
     id: slug,
     sku,
@@ -84,9 +92,11 @@ const products = rows.map((cols, index) => {
     mood: unit ? `Sold per case of ${unit}` : "",
     price: price ? Number(price) : null,
     image: image || fallback,
-    heroImage: heroImage || image || familyImg || `/assets/categories/${category}.svg`,
+    hoverImage: hoverImage || "",
+    heroImage: heroImage || image || skuImg || familyImg || `/assets/categories/${category}.svg`,
     description: "",
     story,
+    badge: badge || "",
     specs: unit ? [`Case: ${unit}`] : [],
     accent: accents[index % accents.length]
   };

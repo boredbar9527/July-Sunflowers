@@ -1,7 +1,14 @@
 <script setup>
 import { computed, reactive, ref } from "vue";
 import { useCart } from "../composables/useCart.js";
-import { buildInvoiceText, formatPrice, nextOrderNumber, sendOrder } from "../config.js";
+import {
+  buildInvoiceHtml,
+  buildInvoiceText,
+  formatPrice,
+  nextOrderNumber,
+  sendOrder
+} from "../config.js";
+import { buildInvoicePdf } from "../utils/invoicePdf.js";
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -22,6 +29,8 @@ const customer = reactive({
 });
 
 const placedOrder = ref(null);
+const sending = ref(false);
+const sendError = ref("");
 
 const lines = computed(() =>
   items.value
@@ -57,17 +66,77 @@ const canSubmit = computed(
     customer.address.trim() !== ""
 );
 
-function placeOrder() {
-  if (!canSubmit.value) return;
+async function placeOrder() {
+  if (!canSubmit.value || sending.value) return;
+  sending.value = true;
+  sendError.value = "";
   const orderNumber = nextOrderNumber();
-  const invoice = buildInvoiceText(orderNumber, lines.value, total.value, customer);
-  placedOrder.value = { number: orderNumber, invoice };
-  sendOrder(orderNumber, invoice);
-  clear();
+  const snapshot = { ...customer };
+  const invoice = buildInvoiceText(orderNumber, lines.value, total.value, snapshot);
+  const dateText = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  const invoiceHtml = buildInvoiceHtml(
+    orderNumber,
+    lines.value,
+    total.value,
+    snapshot,
+    dateText
+  );
+  const lineSnapshot = lines.value.map((l) => ({ ...l }));
+  const totalSnapshot = total.value;
+  // Generate the PO as a PDF to attach to the order email (best-effort).
+  const pdfBase64 = await buildInvoicePdf({
+    orderNumber,
+    dateText,
+    customer: snapshot,
+    lines: lineSnapshot,
+    total: totalSnapshot
+  }).catch(() => null);
+  try {
+    const result = await sendOrder(
+      orderNumber,
+      invoice,
+      snapshot,
+      lineSnapshot,
+      totalSnapshot,
+      dateText,
+      pdfBase64
+    );
+    placedOrder.value = {
+      number: orderNumber,
+      invoice,
+      invoiceHtml,
+      via: result.via,
+      lines: lineSnapshot,
+      total: totalSnapshot
+    };
+    clear();
+  } catch (err) {
+    sendError.value =
+      (err && err.message) ||
+      "We couldn't send the order automatically. Please email us or try again.";
+  } finally {
+    sending.value = false;
+  }
+}
+
+function printInvoice() {
+  if (!placedOrder.value) return;
+  const win = window.open("", "_blank", "width=800,height=900");
+  if (!win) return;
+  win.document.write(placedOrder.value.invoiceHtml);
+  win.document.close();
+  win.focus();
+  // Give the logo a moment to load before the print dialog opens.
+  setTimeout(() => win.print(), 350);
 }
 
 function startNewOrder() {
   placedOrder.value = null;
+  sendError.value = "";
 }
 </script>
 
@@ -91,14 +160,46 @@ function startNewOrder() {
       </button>
 
       <template v-if="placedOrder">
-        <p class="eyebrow">Order prepared</p>
-        <h2 id="cart-title">{{ placedOrder.number }}</h2>
-        <p class="cart-drawer__hint">
-          Your email app should have opened with this invoice, addressed to us.
-          If it didn't, copy the text below and email it manually.
+        <p class="eyebrow">Order received</p>
+        <h2 id="cart-title">Thank you! 🎉</h2>
+        <p class="cart-drawer__success">
+          Your order <strong>{{ placedOrder.number }}</strong> has been sent to July Sunflowers.
+          <strong>Our team will contact you shortly</strong> to confirm availability, pricing, and delivery.
         </p>
-        <pre class="cart-drawer__invoice">{{ placedOrder.invoice }}</pre>
+        <p class="cart-drawer__hint" v-if="placedOrder.via === 'mailto'">
+          Your email app should have opened with this order. If it didn't, use Print / Save as PDF below and send it to us.
+        </p>
+
+        <table class="cart-table cart-table--summary">
+          <thead>
+            <tr><th>Product</th><th>Cases</th><th>Subtotal</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="line in placedOrder.lines" :key="line.id">
+              <td>
+                <strong>{{ line.sku }}</strong>
+                <span class="cart-table__name">{{ line.name }}</span>
+              </td>
+              <td>{{ line.qty }}</td>
+              <td class="cart-table__price">
+                {{ line.subtotal !== null ? formatPrice(line.subtotal) : "Ask" }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">Total</td>
+              <td class="cart-table__price">
+                {{ placedOrder.total !== null ? formatPrice(placedOrder.total) : "On request" }}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+
         <div class="cart-drawer__actions">
+          <button class="button button--primary" type="button" @click="printInvoice">
+            🖨 Print / Save as PDF
+          </button>
           <button class="button button--secondary" type="button" @click="startNewOrder">
             Start a new order
           </button>
@@ -181,9 +282,11 @@ function startNewOrder() {
               <textarea v-model="customer.notes" rows="2"></textarea>
             </label>
 
+            <p class="cart-drawer__error" v-if="sendError">{{ sendError }}</p>
+
             <div class="cart-drawer__actions">
-              <button class="button button--primary" type="submit" :disabled="!canSubmit">
-                Place order — email us the invoice
+              <button class="button button--primary" type="submit" :disabled="!canSubmit || sending">
+                {{ sending ? "Sending…" : "Send order via email" }}
               </button>
             </div>
           </form>

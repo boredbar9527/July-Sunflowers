@@ -2,32 +2,64 @@
 import { computed, onMounted, ref, watch } from "vue";
 import CartDrawer from "./components/CartDrawer.vue";
 import CatalogSection from "./components/CatalogSection.vue";
+import HeroCarousel from "./components/HeroCarousel.vue";
 import ProductDrawer from "./components/ProductDrawer.vue";
 import { useCart } from "./composables/useCart.js";
 import { useCatalog } from "./composables/useCatalog.js";
-import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "./config.js";
+import { groupCategories } from "./utils/categories.js";
+import { DEPARTMENTS } from "./data/departments.js";
+import { PROMO_COPY } from "./data/promos.js";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, STORE_ADDRESS } from "./config.js";
 
-const { products, source } = useCatalog();
+const { products } = useCatalog();
 const { count: cartCount } = useCart();
 
 const filter = ref("all");
+const search = ref("");
 const navOpen = ref(false);
 const cartOpen = ref(false);
 const activeProductId = ref(null);
-const heroStage = ref(null);
-const pointer = ref({ x: "0px", y: "0px" });
+
+const categoryCards = computed(() => groupCategories(products.value));
+
+// Each functional department paired with the type-category cards it contains,
+// for the top-nav mega-menu.
+const departmentMenus = computed(() =>
+  DEPARTMENTS.map((dept) => ({
+    ...dept,
+    cats: dept.categories
+      .map((key) => categoryCards.value.find((c) => c.key === key))
+      .filter(Boolean)
+  }))
+);
+
+// Promo slides for the hero carousel — one per department.
+const heroSlides = computed(() =>
+  departmentMenus.value.map((dept) => {
+    const copy = PROMO_COPY[dept.key] ?? {};
+    return {
+      key: dept.key,
+      filter: dept.key,
+      eyebrow: dept.label,
+      title: copy.title ?? `Shop ${dept.label}`,
+      text: copy.text ?? "",
+      cta: copy.cta ?? `Shop ${dept.label}`,
+      banner: copy.banner ?? null,
+      image: copy.image ?? dept.cats.find((c) => c.image)?.image ?? null,
+      itemCount: dept.cats.reduce((sum, c) => sum + c.items.length, 0)
+    };
+  })
+);
 
 const activeProduct = computed(
   () => products.value.find((p) => p.id === activeProductId.value) ?? null
 );
 
-// Give shared product URLs a meaningful tab/title (client-side).
-const BASE_TITLE = "July Sunflowers | Sunny Softness, Reimagined";
+const BASE_TITLE = "July Sunflowers | Wholesale Foodservice Packaging & Supplies";
 watch(activeProduct, (product) => {
   document.title = product ? `${product.name} — July Sunflowers` : BASE_TITLE;
 });
 
-// Prev/next navigation through the full catalog while the drawer is open.
 const activeIndex = computed(() =>
   products.value.findIndex((p) => p.id === activeProductId.value)
 );
@@ -42,32 +74,6 @@ function goNext() {
   if (canNext.value) openDrawer(products.value[activeIndex.value + 1].id);
 }
 
-const featuredId = computed(() => products.value[1]?.id ?? products.value[0]?.id);
-
-const proofPoints = [
-  {
-    title: "Premium daily essentials",
-    copy: "A warmer retail identity for the products people touch every day.",
-    stat: "Soft touch"
-  },
-  {
-    title: "Responsibly positioned",
-    copy: "Built around FSC-minded sourcing, cleaner packaging language, and practical household use.",
-    stat: "FSC focus"
-  },
-  {
-    title: "Septic-safe bath tissue",
-    copy: "Comfort, strength, and quick-dissolving performance without the hard-sell branding.",
-    stat: "Home ready"
-  }
-];
-
-const storyHighlights = [
-  "Inspired by the warmth, brightness, and resilience of midsummer sunflowers.",
-  "Designed to feel softer and more elevated than generic tissue aisle packaging.",
-  "Balanced for home use, light commercial placement, and bulk-friendly distribution."
-];
-
 function getRouteProductId() {
   const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
   return match ? decodeURIComponent(match[1]).toLowerCase() : null;
@@ -80,7 +86,6 @@ function openDrawer(productId, pushState = true) {
     window.history.pushState({ product: productId }, "", `/product/${productId}`);
   }
 }
-
 function closeDrawer(pushState = true) {
   activeProductId.value = null;
   document.body.classList.remove("drawer-open");
@@ -89,30 +94,23 @@ function closeDrawer(pushState = true) {
   }
 }
 
-function selectCategory(category) {
+function shopCategory(category) {
   filter.value = category;
-  document.querySelector("#collections")?.scrollIntoView({ behavior: "smooth" });
+  document.querySelector("#shop")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  closeNav();
+}
+function submitSearch() {
+  filter.value = "all";
+  document.querySelector("#shop")?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function toggleNav() {
   navOpen.value = !navOpen.value;
   document.body.classList.toggle("nav-open", navOpen.value);
 }
-
 function closeNav() {
   navOpen.value = false;
   document.body.classList.remove("nav-open");
-}
-
-function onStagePointerMove(event) {
-  const rect = heroStage.value.getBoundingClientRect();
-  const x = (event.clientX - rect.left) / rect.width - 0.5;
-  const y = (event.clientY - rect.top) / rect.height - 0.5;
-  pointer.value = { x: `${x * 18}px`, y: `${y * 18}px` };
-}
-
-function onStagePointerLeave() {
-  pointer.value = { x: "0px", y: "0px" };
 }
 
 onMounted(() => {
@@ -125,17 +123,14 @@ onMounted(() => {
         }
       });
     },
-    { threshold: 0.15 }
+    { threshold: 0.12 }
   );
   document.querySelectorAll("[data-reveal]").forEach((node) => revealObserver.observe(node));
 
   window.addEventListener("popstate", () => {
     const productId = getRouteProductId();
-    if (productId) {
-      openDrawer(productId, false);
-    } else {
-      closeDrawer(false);
-    }
+    if (productId) openDrawer(productId, false);
+    else closeDrawer(false);
   });
 
   document.addEventListener("keydown", (event) => {
@@ -157,244 +152,188 @@ onMounted(() => {
 
 <template>
   <div class="site-shell">
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="July Sunflowers home">
-        <img class="brand__logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo" />
-        <div class="brand__text">
-          <span class="brand__eyebrow">Sunny softness</span>
-          <strong>July Sunflowers</strong>
+    <!-- Utility bar -->
+    <div class="utility-bar">
+      <div class="utility-bar__inner">
+        <span class="utility-bar__tag">Wholesale foodservice packaging &amp; disposables — shipped by the case</span>
+        <div class="utility-bar__links">
+          <a :href="`tel:${CONTACT_PHONE_TEL}`">📞 {{ CONTACT_PHONE_DISPLAY }}</a>
+          <a :href="`mailto:${CONTACT_EMAIL}`">✉ {{ CONTACT_EMAIL }}</a>
         </div>
-      </a>
+      </div>
+    </div>
 
-      <button
-        class="menu-toggle"
-        type="button"
-        :aria-expanded="String(navOpen)"
-        aria-controls="site-nav"
-        @click="toggleNav"
-      >
-        Menu
-      </button>
+    <!-- Main header -->
+    <header class="masthead">
+      <div class="masthead__inner">
+        <a class="brand" href="/" aria-label="July Sunflowers home">
+          <img class="brand__logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo" />
+          <span class="brand__text">
+            <strong>July Sunflowers</strong>
+            <span class="brand__sub">Foodservice Supply</span>
+          </span>
+        </a>
 
-      <div class="site-header__right">
-        <nav id="site-nav" class="site-nav" aria-label="Primary">
-          <a href="#top" @click="closeNav">Home</a>
-          <a href="#collections" @click="closeNav">Collections</a>
-          <a href="#story" @click="closeNav">Story</a>
-          <a href="#contact" @click="closeNav">Contact</a>
-        </nav>
+        <form class="searchbar" role="search" @submit.prevent="submitSearch">
+          <input
+            v-model="search"
+            type="search"
+            class="searchbar__input"
+            placeholder="Search 230+ products by name or item #…"
+            aria-label="Search products"
+          />
+          <button class="searchbar__btn" type="submit" aria-label="Search">
+            <span aria-hidden="true">🔍</span>
+            <span class="searchbar__btn-label">Search</span>
+          </button>
+        </form>
 
-        <a class="header-chip" :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</a>
-        <button class="header-chip header-chip--cart" type="button" @click="cartOpen = true">
-          🗒 Order<span v-if="cartCount"> ({{ cartCount }})</span>
-        </button>
+        <div class="masthead__actions">
+          <a class="acct-chip" :href="`mailto:${CONTACT_EMAIL}`">
+            <span class="acct-chip__icon" aria-hidden="true">👤</span>
+            <span class="acct-chip__text"><small>Wholesale</small>Account</span>
+          </a>
+          <button class="acct-chip acct-chip--cart" type="button" @click="cartOpen = true">
+            <span class="acct-chip__icon" aria-hidden="true">🛒</span>
+            <span class="acct-chip__text"><small>Your list</small>Cart<em v-if="cartCount">{{ cartCount }}</em></span>
+          </button>
+        </div>
       </div>
     </header>
 
-    <main>
-      <section class="hero section" id="top">
-        <div class="hero__copy" data-reveal>
-          <p class="eyebrow">Brand refresh concept</p>
-          <h1 class="hero__title">
-            Paper essentials that feel
-            <span>brighter than the aisle</span>
-          </h1>
-          <p class="hero__lede">
-            July Sunflowers already had a clear product story. This redesign turns it into a warmer,
-            more premium experience with stronger packaging presence, cleaner hierarchy, and a more
-            intentional sense of atmosphere.
-          </p>
-
-          <div class="hero__actions">
-            <a class="button button--primary" href="#collections">Explore collections</a>
-            <button
-              class="button button--secondary"
-              type="button"
-              :disabled="!featuredId"
-              @click="openDrawer(featuredId)"
-            >
-              Open featured case
+    <!-- Department nav with mega-menu -->
+    <nav class="catnav" aria-label="Shop departments">
+      <div class="catnav__inner">
+        <button class="catnav__all" type="button" @click="shopCategory('all')">
+          <span aria-hidden="true">☰</span> All Products
+        </button>
+        <button class="catnav__toggle" type="button" @click="toggleNav" :aria-expanded="String(navOpen)">
+          Departments ▾
+        </button>
+        <div class="catnav__links" :class="{ 'is-open': navOpen }">
+          <div class="megawrap" v-for="dept in departmentMenus" :key="dept.key">
+            <button class="megawrap__label" type="button" @click="shopCategory(dept.key)">
+              {{ dept.label }} <span class="megawrap__caret" aria-hidden="true">▾</span>
             </button>
-          </div>
-
-          <div class="hero__facts">
-            <div class="metric-card">
-              <span class="metric-card__label">Facial tissue</span>
-              <strong>3-ply softness</strong>
+            <div class="megamenu">
+              <div class="megamenu__inner">
+                <div class="megamenu__head">
+                  <span>{{ dept.label }}</span>
+                  <button type="button" @click="shopCategory(dept.key)">Shop all ›</button>
+                </div>
+                <div class="megamenu__grid">
+                  <button
+                    v-for="cat in dept.cats"
+                    :key="cat.key"
+                    class="megamenu__item"
+                    type="button"
+                    @click="shopCategory(cat.key)"
+                  >
+                    <img :src="cat.image || `/assets/categories/${cat.key}.svg`" :alt="cat.label" />
+                    <span class="megamenu__item-text">
+                      {{ cat.label }}<em>{{ cat.items.length }} items</em>
+                    </span>
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="metric-card">
-              <span class="metric-card__label">Bath tissue</span>
-              <strong>4-ply comfort</strong>
-            </div>
-            <div class="metric-card metric-card--icon">
-              <img src="/assets/fsc-itqMhG3J.png" alt="FSC icon" />
-              <strong>Responsible positioning</strong>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="hero__stage"
-          data-reveal
-          ref="heroStage"
-          :style="{ '--pointer-x': pointer.x, '--pointer-y': pointer.y }"
-          @pointermove="onStagePointerMove"
-          @pointerleave="onStagePointerLeave"
-        >
-          <div class="hero-glow hero-glow--sun"></div>
-          <div class="hero-glow hero-glow--leaf"></div>
-          <img class="hero-ring hero-ring--one" src="/assets/Ring_green-CB9I9mGj.png" alt="" />
-          <img class="hero-ring hero-ring--two" src="/assets/Ring_blue-Dgr3Qvs1.png" alt="" />
-
-          <div class="hero-card hero-card--primary">
-            <div class="hero-card__content">
-              <span class="hero-card__tag">Facial Tissue</span>
-              <h2>Soft geometry, brighter packaging, cleaner shelf presence.</h2>
-            </div>
-            <img src="/assets/introA-D1LV2l4Y.png" alt="Facial tissue packs" />
-          </div>
-
-          <div class="hero-card hero-card--secondary">
-            <div class="hero-card__content">
-              <span class="hero-card__tag">Bath Tissue</span>
-              <p>Comfort-led packs with a warmer retail tone.</p>
-            </div>
-            <img src="/assets/bath-tissue-24-group-CzUg8Czx.png" alt="Bath tissue box and rolls" />
           </div>
         </div>
-      </section>
-
-      <div class="wave-band" aria-hidden="true">
-        <img src="/assets/Blue_Sharp-BfeH3kMk.png" alt="" />
       </div>
+    </nav>
 
-      <section class="proof section">
-        <div class="section-head" data-reveal>
-          <div>
-            <p class="eyebrow">What changed</p>
-            <h2>Less generic catalog page, more real brand world.</h2>
-          </div>
-          <p class="section-head__copy">
-            The previous version functioned as a mirror. This version treats the product line like a
-            brand people could actually remember.
-          </p>
-        </div>
-
-        <div class="proof-grid">
-          <article class="proof-card" data-reveal v-for="item in proofPoints" :key="item.title">
-            <span class="proof-card__stat">{{ item.stat }}</span>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.copy }}</p>
-          </article>
-        </div>
+    <main>
+      <!-- Hero promo carousel (covered by the department mega-menu on hover) -->
+      <section class="hero" id="top">
+        <HeroCarousel :slides="heroSlides" @shop="shopCategory" />
+        <ul class="hero__badges">
+          <li><strong>230+</strong> case-ready SKUs</li>
+          <li><strong>17</strong> categories</li>
+          <li><strong>Same-day</strong> quotes</li>
+          <li><strong>Chino, CA</strong> warehouse</li>
+        </ul>
       </section>
 
-      <section class="categories section">
-        <article class="category-card category-card--containers" data-reveal>
-          <div class="category-card__copy">
-            <p class="eyebrow">Collection 01</p>
-            <h2>Food containers for takeout, meal prep, and the deli case.</h2>
-            <p>
-              Rectangular, round, and hinged clamshells across every size — the workhorses that make
-              up the largest part of the range.
-            </p>
-            <button class="inline-button" type="button" @click="selectCategory('plastic-containers')">
-              Browse containers
-            </button>
-          </div>
-          <div class="category-card__visual">
-            <img src="/assets/categories/plastic-containers.svg" alt="Plastic food containers" />
-          </div>
-        </article>
-
-        <article class="category-card category-card--cups" data-reveal>
-          <div class="category-card__copy">
-            <p class="eyebrow">Collection 02</p>
-            <h2>Cups and drinkware for hot and cold service.</h2>
-            <p>
-              Paper hot cups, clear cold cups, lids, sleeves, and carriers — sized for cafés, juice
-              bars, and to-go counters.
-            </p>
-            <button class="inline-button" type="button" @click="selectCategory('hot-cups')">
-              Browse cups &amp; drinkware
-            </button>
-          </div>
-          <div class="category-card__visual">
-            <img src="/assets/categories/hot-cups.svg" alt="Hot and cold cups" />
-          </div>
-        </article>
+      <!-- Shop by category -->
+      <section class="cats section" id="categories">
+        <div class="cats__head">
+          <h2>Shop by Category</h2>
+          <p>Every case format in one place — pick a department to jump in.</p>
+        </div>
+        <div class="cats__grid">
+          <button
+            v-for="cat in categoryCards"
+            :key="cat.key"
+            class="cat-tile"
+            type="button"
+            data-reveal
+            @click="shopCategory(cat.key)"
+          >
+            <span class="cat-tile__art" :class="{ 'is-photo': cat.image }">
+              <img :src="cat.image || `/assets/categories/${cat.key}.svg`" :alt="cat.label" />
+            </span>
+            <span class="cat-tile__label">{{ cat.label }}</span>
+            <span class="cat-tile__count">{{ cat.items.length }} items · from {{ cat.priceText.split(" ")[0] }}</span>
+          </button>
+        </div>
       </section>
 
       <CatalogSection
         :products="products"
         v-model:filter="filter"
+        v-model:search="search"
         @open="openDrawer"
       />
 
-      <section class="story section" id="story">
-        <div class="story__copy" data-reveal>
-          <p class="eyebrow">Story and tone</p>
-          <h2>Warm, resilient, and a little more joyful than standard tissue branding.</h2>
-          <p>
-            July Sunflowers started with the right emotional idea: warmth, brightness, comfort, and
-            clean daily use. The redesign pushes that idea further with richer spacing, a warmer paper
-            palette, stronger product framing, and a more editorial presentation of the people and
-            atmosphere around the brand.
-          </p>
-
-          <div class="story-list">
-            <div class="story-list__item" v-for="line in storyHighlights" :key="line">
-              <span></span>
-              <p>{{ line }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="story__visual" data-reveal>
-          <div class="collage collage--large">
-            <img src="/assets/founder-2-DetXMqVk.jpg" alt="Brand story moment" />
-          </div>
-          <div class="collage collage--small collage--product">
-            <img src="/assets/bath-tissue-24-box-6EgTFqhB.png" alt="Bath tissue box" />
-          </div>
-          <div class="collage collage--small">
-            <img src="/assets/founder-3-DTGoNZbi.jpg" alt="Founder portrait" />
-          </div>
-          <div class="collage collage--wide">
-            <img src="/assets/founder-1-tzXmZdUA.jpg" alt="Performance portrait" />
-          </div>
-        </div>
-      </section>
-
+      <!-- Contact -->
       <section class="contact section" id="contact">
-        <div class="contact__intro" data-reveal>
-          <p class="eyebrow">Contact</p>
-          <h2>Ready for retail, wholesale, and direct conversations.</h2>
-          <p>
-            The product line already exists. This redesign simply gives it a sharper front door.
-          </p>
-        </div>
-
-        <div class="contact-grid">
-          <a class="contact-card" href="tel:+19098283565" data-reveal>
-            <span class="contact-card__label">Phone</span>
-            <strong>{{ CONTACT_PHONE_DISPLAY }}</strong>
-          </a>
-          <a class="contact-card" :href="`mailto:${CONTACT_EMAIL}`" data-reveal>
-            <span class="contact-card__label">Email</span>
-            <strong>{{ CONTACT_EMAIL }}</strong>
-          </a>
-          <div class="contact-card" data-reveal>
-            <span class="contact-card__label">Address</span>
-            <strong>5595 Daniels St STE B<br />Chino, CA 91710<br />United States</strong>
+        <div class="contact__inner">
+          <div class="contact__intro">
+            <h2>Ready to place a wholesale order?</h2>
+            <p>Build your list, then send it over — we confirm availability, case pricing, and freight the same business day.</p>
+          </div>
+          <div class="contact__cards">
+            <a class="contact-card" :href="`tel:${CONTACT_PHONE_TEL}`">
+              <span>Phone</span><strong>{{ CONTACT_PHONE_DISPLAY }}</strong>
+            </a>
+            <a class="contact-card" :href="`mailto:${CONTACT_EMAIL}`">
+              <span>Email</span><strong>{{ CONTACT_EMAIL }}</strong>
+            </a>
+            <div class="contact-card">
+              <span>Warehouse</span><strong>{{ STORE_ADDRESS }}</strong>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>© 2026 July Sunflowers</p>
-      <p>Sunny softness. Pure joy.</p>
+      <div class="site-footer__inner">
+        <div class="site-footer__brand">
+          <img src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers" />
+          <p>Wholesale foodservice packaging &amp; disposables, shipped by the case from Chino, California.</p>
+        </div>
+        <div class="site-footer__col">
+          <h3>Shop</h3>
+          <button v-for="dept in DEPARTMENTS" :key="dept.key" type="button" @click="shopCategory(dept.key)">{{ dept.label }}</button>
+        </div>
+        <div class="site-footer__col">
+          <h3>Company</h3>
+          <a href="#top">Home</a>
+          <a href="#categories">Categories</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="site-footer__col">
+          <h3>Contact</h3>
+          <a :href="`tel:${CONTACT_PHONE_TEL}`">{{ CONTACT_PHONE_DISPLAY }}</a>
+          <a :href="`mailto:${CONTACT_EMAIL}`">{{ CONTACT_EMAIL }}</a>
+          <span>{{ STORE_ADDRESS }}</span>
+        </div>
+      </div>
+      <div class="site-footer__bar">
+        <p>© 2026 July Sunflowers</p>
+        <p>Sunny softness. Serious supply.</p>
+      </div>
     </footer>
 
     <ProductDrawer

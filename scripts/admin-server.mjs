@@ -15,7 +15,15 @@ import { CATALOG_HEADER, parseCsv, serializeCsv } from "./csv-utils.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const csvPath = join(root, "data", "catalog.csv");
 const productImgDir = join(root, "public", "assets", "products");
+const promosPath = join(root, "src", "data", "promos.json");
+const promoImgDir = join(root, "public", "assets", "promos");
+const settingsPath = join(root, "src", "data", "settings.json");
 const PORT = 5174;
+
+// Contact/biodata fields the admin is allowed to edit.
+const SETTINGS_FIELDS = [
+  "contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address", "web3formsKey"
+];
 
 const execFileAsync = promisify(execFile);
 async function git(...args) {
@@ -28,7 +36,13 @@ async function git(...args) {
 }
 
 // Only these paths are ever published by the admin — code changes stay out.
-const PUBLISH_PATHS = ["data/catalog.csv", "public/assets/products"];
+const PUBLISH_PATHS = [
+  "data/catalog.csv",
+  "public/assets/products",
+  "src/data/promos.json",
+  "public/assets/promos",
+  "src/data/settings.json"
+];
 
 // Commits made locally but not yet pushed (e.g. a publish whose push failed).
 async function aheadCount() {
@@ -210,28 +224,75 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/upload") {
-      // body: { filename, data } — data is the file content, base64-encoded.
+      // body: { filename, data, folder? } — data is base64. folder "promos"
+      // stores banner images; anything else stores product photos.
       const body = await readBody(req);
       const extMatch = /\.(jpe?g|png|webp)$/i.exec(body.filename || "");
       if (!extMatch) {
         return json(res, 400, { error: "Image must be a .jpg, .png, or .webp file." });
       }
+      const folder = body.folder === "promos" ? "promos" : "products";
+      const targetDir = folder === "promos" ? promoImgDir : productImgDir;
       const ext = extMatch[1].toLowerCase() === "jpeg" ? "jpg" : extMatch[1].toLowerCase();
       const base = String(body.filename)
         .replace(/\.[^.]+$/, "")
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "product";
+        .replace(/^-|-$/g, "") || "image";
       const buf = Buffer.from(String(body.data || ""), "base64");
       if (!buf.length) return json(res, 400, { error: "Empty file." });
       if (buf.length > 8 * 1024 * 1024) {
         return json(res, 400, { error: "Image is larger than 8 MB — please resize it first." });
       }
-      mkdirSync(productImgDir, { recursive: true });
+      mkdirSync(targetDir, { recursive: true });
       let name = `${base}.${ext}`;
-      for (let n = 2; existsSync(join(productImgDir, name)); n++) name = `${base}-${n}.${ext}`;
-      writeFileSync(join(productImgDir, name), buf);
-      json(res, 200, { ok: true, path: `/assets/products/${name}` });
+      for (let n = 2; existsSync(join(targetDir, name)); n++) name = `${base}-${n}.${ext}`;
+      writeFileSync(join(targetDir, name), buf);
+      json(res, 200, { ok: true, path: `/assets/${folder}/${name}` });
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/promos") {
+      json(res, 200, JSON.parse(readFileSync(promosPath, "utf8")));
+      return;
+    }
+
+    if (req.method === "PUT" && url.pathname === "/api/promos") {
+      // body: full promos object keyed by department. Only known text/banner
+      // fields are persisted per slide.
+      const body = await readBody(req);
+      if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return json(res, 400, { error: "Invalid promos payload." });
+      }
+      const current = JSON.parse(readFileSync(promosPath, "utf8"));
+      for (const [key, slide] of Object.entries(body)) {
+        if (!current[key] || typeof slide !== "object") continue;
+        for (const field of ["label", "title", "text", "cta", "banner"]) {
+          if (typeof slide[field] === "string") current[key][field] = slide[field];
+        }
+      }
+      writeFileSync(promosPath, JSON.stringify(current, null, 2) + "\n");
+      json(res, 200, { ok: true });
+      return;
+    }
+
+    if (req.method === "GET" && url.pathname === "/api/settings") {
+      json(res, 200, JSON.parse(readFileSync(settingsPath, "utf8")));
+      return;
+    }
+
+    if (req.method === "PUT" && url.pathname === "/api/settings") {
+      // body: contact/biodata object. Only known string fields are persisted.
+      const body = await readBody(req);
+      if (!body || typeof body !== "object" || Array.isArray(body)) {
+        return json(res, 400, { error: "Invalid settings payload." });
+      }
+      const current = JSON.parse(readFileSync(settingsPath, "utf8"));
+      for (const field of SETTINGS_FIELDS) {
+        if (typeof body[field] === "string") current[field] = body[field].trim();
+      }
+      writeFileSync(settingsPath, JSON.stringify(current, null, 2) + "\n");
+      json(res, 200, { ok: true });
       return;
     }
 
