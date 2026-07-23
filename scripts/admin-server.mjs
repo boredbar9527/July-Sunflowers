@@ -15,8 +15,6 @@ import { CATALOG_HEADER, parseCsv, serializeCsv } from "./csv-utils.mjs";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const csvPath = join(root, "data", "catalog.csv");
 const productImgDir = join(root, "public", "assets", "products");
-const promosPath = join(root, "src", "data", "promos.json");
-const promoImgDir = join(root, "public", "assets", "promos");
 const settingsPath = join(root, "src", "data", "settings.json");
 const PORT = Number(process.env.ADMIN_PORT) || 5177;
 
@@ -39,8 +37,6 @@ async function git(...args) {
 const PUBLISH_PATHS = [
   "data/catalog.csv",
   "public/assets/products",
-  "src/data/promos.json",
-  "public/assets/promos",
   "src/data/settings.json"
 ];
 
@@ -224,15 +220,14 @@ const server = createServer(async (req, res) => {
     }
 
     if (req.method === "POST" && url.pathname === "/api/upload") {
-      // body: { filename, data, folder? } — data is base64. folder "promos"
-      // stores banner images; anything else stores product photos.
+      // body: { filename, data } — data is base64; stores product photos.
       const body = await readBody(req);
       const extMatch = /\.(jpe?g|png|webp)$/i.exec(body.filename || "");
       if (!extMatch) {
         return json(res, 400, { error: "Image must be a .jpg, .png, or .webp file." });
       }
-      const folder = body.folder === "promos" ? "promos" : "products";
-      const targetDir = folder === "promos" ? promoImgDir : productImgDir;
+      const folder = "products";
+      const targetDir = productImgDir;
       const ext = extMatch[1].toLowerCase() === "jpeg" ? "jpg" : extMatch[1].toLowerCase();
       const base = String(body.filename)
         .replace(/\.[^.]+$/, "")
@@ -249,30 +244,6 @@ const server = createServer(async (req, res) => {
       for (let n = 2; existsSync(join(targetDir, name)); n++) name = `${base}-${n}.${ext}`;
       writeFileSync(join(targetDir, name), buf);
       json(res, 200, { ok: true, path: `/assets/${folder}/${name}` });
-      return;
-    }
-
-    if (req.method === "GET" && url.pathname === "/api/promos") {
-      json(res, 200, JSON.parse(readFileSync(promosPath, "utf8")));
-      return;
-    }
-
-    if (req.method === "PUT" && url.pathname === "/api/promos") {
-      // body: full promos object keyed by department. Only known text/banner
-      // fields are persisted per slide.
-      const body = await readBody(req);
-      if (!body || typeof body !== "object" || Array.isArray(body)) {
-        return json(res, 400, { error: "Invalid promos payload." });
-      }
-      const current = JSON.parse(readFileSync(promosPath, "utf8"));
-      for (const [key, slide] of Object.entries(body)) {
-        if (!current[key] || typeof slide !== "object") continue;
-        for (const field of ["label", "title", "text", "cta", "banner"]) {
-          if (typeof slide[field] === "string") current[key][field] = slide[field];
-        }
-      }
-      writeFileSync(promosPath, JSON.stringify(current, null, 2) + "\n");
-      json(res, 200, { ok: true });
       return;
     }
 

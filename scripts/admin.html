@@ -118,8 +118,6 @@
   }
   .preview { font-size: 0.85rem; margin-top: 10px; }
   input[type="file"] { border: 0; padding: 0; background: none; border-radius: 0; }
-  .promo-edit { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 14px; background: var(--bg); }
-  .promo-edit__head { font-weight: 800; margin-bottom: 10px; color: var(--green-d); }
   .p-banner-preview { max-height: 96px; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid var(--line); }
   @media (max-width: 640px) {
     header { flex-wrap: wrap; }
@@ -188,18 +186,6 @@
       </div>
     </div>
     <div class="preview muted" id="adj-preview"></div>
-  </section>
-
-  <section id="promos">
-    <h2>Homepage promo slides <span class="count-pill">5</span></h2>
-    <p class="muted" style="margin:-6px 0 14px">
-      Upload a banner image for each hero slide (recommended ~1600×440px), or edit its text.
-      Leave the banner empty to use the automatic product-photo layout.
-    </p>
-    <div id="promo-list"></div>
-    <div style="margin-top:14px">
-      <button class="primary" id="promo-save">Save promo slides</button>
-    </div>
   </section>
 
   <section>
@@ -577,83 +563,6 @@ form.addEventListener("submit", async (e) => {
   } catch (err) { toast(err.message, true); }
 });
 
-// --- homepage promo slides ---
-let promos = {};
-async function loadPromos() {
-  promos = await api("/api/promos");
-  renderPromos();
-}
-function renderPromos() {
-  $("promo-list").innerHTML = Object.entries(promos).map(([key, p]) => `
-    <div class="promo-edit" data-key="${esc(key)}">
-      <div class="promo-edit__head">${esc(p.label || key)}</div>
-      <div class="grid2">
-        <div class="full">
-          <label>Banner image — empty = automatic product-photo layout</label>
-          <input class="p-banner" value="${esc(p.banner || "")}" placeholder="/assets/promos/…">
-          <input type="file" class="p-banner-file" accept=".jpg,.jpeg,.png,.webp" style="margin-top:6px; font-size:13px">
-          <img class="p-banner-preview" src="${esc(p.banner || "")}" alt="" style="${p.banner ? "" : "display:none"}">
-        </div>
-        <div><label>Title</label><input class="p-title" value="${esc(p.title || "")}"></div>
-        <div><label>Button text (CTA)</label><input class="p-cta" value="${esc(p.cta || "")}"></div>
-        <div class="full"><label>Text</label><textarea class="p-text">${esc(p.text || "")}</textarea></div>
-      </div>
-    </div>`).join("");
-}
-
-// Upload a banner when a file is chosen, and fill in the path + preview.
-$("promo-list").addEventListener("change", async (e) => {
-  if (!e.target.classList.contains("p-banner-file")) return;
-  const file = e.target.files[0];
-  if (!file) return;
-  const wrap = e.target.closest(".promo-edit");
-  try {
-    const data = await new Promise((resolve, reject) => {
-      const r = new FileReader();
-      r.onload = () => resolve(String(r.result).split(",")[1]);
-      r.onerror = () => reject(new Error("Could not read the file."));
-      r.readAsDataURL(file);
-    });
-    const res = await api("/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: file.name, data, folder: "promos" })
-    });
-    wrap.querySelector(".p-banner").value = res.path;
-    const prev = wrap.querySelector(".p-banner-preview");
-    prev.src = res.path;
-    prev.style.display = "";
-    toast(`Uploaded ${file.name}.`);
-  } catch (err) {
-    toast(err.message, true);
-  } finally {
-    e.target.value = "";
-  }
-});
-
-$("promo-save").addEventListener("click", async () => {
-  const payload = {};
-  $("promo-list").querySelectorAll(".promo-edit").forEach((wrap) => {
-    payload[wrap.dataset.key] = {
-      banner: wrap.querySelector(".p-banner").value.trim(),
-      title: wrap.querySelector(".p-title").value.trim(),
-      cta: wrap.querySelector(".p-cta").value.trim(),
-      text: wrap.querySelector(".p-text").value.trim()
-    };
-  });
-  try {
-    await api("/api/promos", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    toast("Saved promo slides.");
-    refreshPublishStatus();
-  } catch (e) {
-    toast(e.message, true);
-  }
-});
-
 // --- store info / contact settings ---
 const SETTINGS_KEYS = ["contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address"];
 async function loadSettings() {
@@ -680,7 +589,6 @@ $("settings-save").addEventListener("click", async () => {
 });
 
 load().catch((e) => toast(e.message, true));
-loadPromos().catch((e) => toast(e.message, true));
 loadSettings().catch((e) => toast(e.message, true));
 </script>
 </body>
