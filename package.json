@@ -13,6 +13,10 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.3",
+    "supabase": "^2.109.1",
     "vite": "^7.2.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.8"
   }
 }

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>July Sunflowers | Online Catalog Admin</title>
+<meta name="theme-color" content="#2f7d32">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<style>
+  :root {
+    --green:#2f7d32; --green-d:#256127; --nav:#234d27; --orange:#ef7c1b; --orange-d:#d76c11;
+    --ink:#1f2a24; --text:#3b423d; --muted:#6d7570; --line:#e2e6e2; --line-2:#eef1ee;
+    --bg:#f1f3f1; --surface:#fff; --accent-tint:#eef6ee; --price:#17532a; --danger:#c23b2b;
+    --shadow:0 1px 2px rgba(20,40,25,.06),0 8px 24px rgba(20,40,25,.06); --radius:10px; --radius-sm:7px;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 var(--font);color:var(--text);min-height:100vh;background:var(--bg)}
+  header{position:sticky;top:0;z-index:30;padding:12px 24px;display:flex;align-items:center;gap:14px;
+    background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  header h1{font-weight:800;font-size:1.25rem;margin:0;color:var(--green-d);letter-spacing:-.01em}
+  header .eyebrow{font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  header .spacer{margin-left:auto}
+  main{max-width:1180px;margin:0 auto;padding:24px 20px 80px}
+  section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px 24px;margin-bottom:18px;box-shadow:var(--shadow)}
+  h2{font-weight:800;font-size:1.2rem;margin:0 0 14px;color:var(--ink)}
+  label{font-size:.78rem;font-weight:700;color:var(--muted);display:block;margin-bottom:4px}
+  input,select,textarea,button{font:inherit}
+  input,select,textarea{border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 12px;
+    background:#fff;width:100%;color:var(--ink);font-size:.92rem}
+  input:focus-visible,select:focus-visible,textarea:focus-visible{outline:none;border-color:var(--green);
+    box-shadow:0 0 0 3px var(--accent-tint)}
+  button{border:0;border-radius:var(--radius-sm);padding:10px 18px;cursor:pointer;font-weight:700;
+    transition:background-color .15s,transform .12s,border-color .15s}
+  button.primary{color:#fff;background:var(--green)}
+  button.primary:hover:not(:disabled){background:var(--green-d)}
+  button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  button.ghost:hover:not(:disabled){border-color:var(--green);color:var(--green-d)}
+  button.danger{background:var(--danger);color:#fff}
+  button:hover:not(:disabled){transform:translateY(-1px)}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .row>div{flex:1;min-width:130px}
+  .row>div.narrow{flex:0 0 130px;min-width:120px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+  th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--green-d);
+    position:sticky;top:0;background:var(--accent-tint);z-index:1}
+  tbody tr:hover{background:var(--accent-tint)}
+  td.num,th.num{text-align:right;white-space:nowrap}
+  td.num{font-weight:700;color:var(--price)}
+  td img.thumb{width:44px;height:44px;object-fit:contain;border:1px solid var(--line);border-radius:6px;background:#fff}
+  .table-wrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+  .muted{color:var(--muted);font-weight:400}
+  .actions{white-space:nowrap;text-align:right}
+  .actions button{padding:6px 12px;font-size:.82rem;margin-left:4px}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--nav);color:#fff;
+    padding:12px 22px;border-radius:var(--radius-sm);box-shadow:var(--shadow);opacity:0;transition:opacity .25s;
+    pointer-events:none;max-width:90vw;z-index:100}
+  #toast.show{opacity:1}
+  #toast.error{background:var(--danger)}
+  dialog{border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;width:min(640px,92vw);
+    background:var(--surface);box-shadow:0 20px 50px rgba(20,40,25,.18);color:var(--text)}
+  dialog::backdrop{background:rgba(20,30,24,.48)}
+  dialog h2{margin-bottom:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2 .full{grid-column:1/-1}
+  .dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+  .count-pill{background:var(--accent-tint);color:var(--green-d);border-radius:999px;padding:3px 12px;
+    font-size:.8rem;font-weight:700;vertical-align:middle}
+  input[type="file"]{border:0;padding:0;background:none}
+  .thumb-preview{max-height:90px;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--line)}
+  /* login gate */
+  #gate{max-width:420px;margin:9vh auto 0;padding:34px 32px}
+  #gate p{color:var(--muted);margin:0 0 18px}
+  #gate .brand{font-weight:800;font-size:1.5rem;color:var(--green-d);margin:0 0 4px}
+  .hidden{display:none!important}
+  @media(max-width:640px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Login gate -->
+<section id="gate" class="hidden">
+  <p class="brand">July Sunflowers</p>
+  <h2 style="margin:0 0 6px">Catalog Admin</h2>
+  <p>Enter your admin email. We'll send you a one-time login link — no password needed.</p>
+  <div class="row">
+    <div><label>Admin email</label><input id="login-email" type="email" placeholder="you@example.com" autocomplete="email"></div>
+  </div>
+  <div style="margin-top:14px"><button class="primary" id="login-send" style="width:100%">Send login link</button></div>
+  <p id="login-msg" class="muted" style="margin-top:14px"></p>
+</section>
+
+<!-- App (shown once authenticated as admin) -->
+<div id="app" class="hidden">
+  <header>
+    <div>
+      <div class="eyebrow">Online Catalog</div>
+      <h1>July Sunflowers Admin</h1>
+    </div>
+    <div class="spacer"></div>
+    <span id="who" class="muted" style="font-size:13px"></span>
+    <button class="ghost" id="logout">Log out</button>
+  </header>
+  <main>
+    <section>
+      <h2>Price adjustment</h2>
+      <p class="muted" style="margin-top:-8px">Raise or lower every product's price by a percentage. Use a negative value to discount.</p>
+      <div class="row">
+        <div class="narrow"><label>Percent (%)</label><input id="adj-pct" type="number" step="0.5" placeholder="e.g. 10 or -5"></div>
+        <div style="flex:0 0 auto"><button class="primary" id="adj-apply">Apply to all</button></div>
+      </div>
+    </section>
+
+    <section>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <h2 style="margin:0">Products <span class="count-pill" id="count">0</span></h2>
+        <div class="spacer" style="margin-left:auto"></div>
+        <input id="search" placeholder="Search sku / name / category" style="max-width:280px">
+        <button class="primary" id="btn-add">+ Add listing</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:56px">Img</th><th style="width:90px">SKU</th><th>Name</th>
+            <th>Category</th><th style="width:90px">Unit</th><th class="num" style="width:90px">Price</th>
+            <th class="actions" style="width:150px">Actions</th>
+          </tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Add / edit dialog -->
+<dialog id="dlg">
+  <h2 id="dlg-title">Add listing</h2>
+  <div class="grid2">
+    <div><label>SKU *</label><input id="f-sku" placeholder="e.g. F-10"></div>
+    <div><label>Price (USD)</label><input id="f-price" type="number" step="0.01" placeholder="40.00"></div>
+    <div class="full"><label>Name *</label><input id="f-name" placeholder="Facial Tissues 3-PLY"></div>
+    <div><label>Category label *</label><input id="f-catlabel" list="catlist" placeholder="Facial & Bath Tissue"></div>
+    <div><label>Unit / pack</label><input id="f-unit" placeholder="80PCS"></div>
+    <div class="full"><label>Product image</label><input id="f-file" type="file" accept="image/*"><img id="f-preview" class="thumb-preview"></div>
+    <div class="full"><label>…or image URL</label><input id="f-image" placeholder="/assets/catalog/item-001.png or https://…"></div>
+  </div>
+  <datalist id="catlist"></datalist>
+  <div class="dialog-actions">
+    <button class="ghost" id="dlg-cancel">Cancel</button>
+    <button class="primary" id="dlg-save">Save</button>
+  </div>
+</dialog>
+
+<div id="toast"></div>
+<script type="module" src="/src/admin/admin.js"></script>
+</body>
+</html>

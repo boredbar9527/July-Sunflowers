@@ -1,5 +1,8 @@
 import "./styles.css";
-import { catalog } from "./catalog.js";
+
+// Live catalog fetched from Supabase before this module loads (see index.html),
+// with a static build-time snapshot as fallback.
+const catalog = window.__CATALOG__;
 
 // Representative thumbnail for each category tile = first item in the group.
 const groups = catalog.groups;
