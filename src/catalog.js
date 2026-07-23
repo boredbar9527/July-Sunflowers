@@ -1,7 +1,7 @@
-// Auto-generated from July Sunflowers wholesale price list (JSF JUNE3.pdf).
-// 232 SKUs with thumbnails, item #, pack size, and case price.
+// Auto-generated from data/catalog.csv by scripts/build-catalog.mjs.
+// Do not edit by hand — edit the catalog through `npm run admin` instead.
 export const catalog = {
-  "generatedFrom": "JSF JUNE3.pdf",
+  "generatedFrom": "data/catalog.csv",
   "total": 232,
   "groups": [
     {
@@ -1155,7 +1155,7 @@ export const catalog = {
           "image": "/assets/catalog/item-138.png"
         },
         {
-          "no": 199,
+          "no": 139,
           "sku": "CDA05",
           "name": "5 oz White Paper Food Cup",
           "pack": "500PCS/CTN",
@@ -1163,7 +1163,7 @@ export const catalog = {
           "image": "/assets/catalog/item-199.png"
         },
         {
-          "no": 200,
+          "no": 140,
           "sku": "CDA08",
           "name": "8 oz White Paper Food Cup",
           "pack": "500PCS/CTN",
@@ -1171,7 +1171,7 @@ export const catalog = {
           "image": "/assets/catalog/item-200.png"
         },
         {
-          "no": 201,
+          "no": 141,
           "sku": "CDA12",
           "name": "12 oz White Paper Food Cup",
           "pack": "500PCS/CTN",
@@ -1179,7 +1179,7 @@ export const catalog = {
           "image": "/assets/catalog/item-201.png"
         },
         {
-          "no": 202,
+          "no": 142,
           "sku": "CDA16",
           "name": "16 oz White Paper Food Cup",
           "pack": "500PCS/CTN",
@@ -1187,7 +1187,7 @@ export const catalog = {
           "image": "/assets/catalog/item-202.png"
         },
         {
-          "no": 203,
+          "no": 143,
           "sku": "CDA32",
           "name": "32 oz White Paper Food Cup",
           "pack": "500PCS/CTN",
@@ -1195,15 +1195,15 @@ export const catalog = {
           "image": "/assets/catalog/item-203.png"
         },
         {
-          "no": 204,
+          "no": 144,
           "sku": "CDA115",
           "name": "115MM Paper Lid (Fit 32 oz)",
           "pack": "500PCS/CTN",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-204.png"
         },
         {
-          "no": 205,
+          "no": 145,
           "sku": "CDA98PP",
           "name": "98mm PP Flat Lid (8oz-16oz)",
           "pack": "500PCS/CTN",
@@ -1218,7 +1218,7 @@ export const catalog = {
       "slug": "straws-chopsticks-cutlery",
       "items": [
         {
-          "no": 139,
+          "no": 146,
           "sku": "PSS-6229",
           "name": "9\" Plastic Sharp Straws Black 6*229MM Film Wrapped",
           "pack": "300PCS* 24BAGS",
@@ -1226,7 +1226,7 @@ export const catalog = {
           "image": "/assets/catalog/item-139.png"
         },
         {
-          "no": 140,
+          "no": 147,
           "sku": "STRAWB1",
           "name": "9\" Plastic Boba Straws Black 12*229MM Film Wrapped",
           "pack": "200*8 Bags",
@@ -1234,7 +1234,7 @@ export const catalog = {
           "image": "/assets/catalog/item-140.png"
         },
         {
-          "no": 141,
+          "no": 148,
           "sku": "STRAW S3",
           "name": "9\"BOBA Straws 9x12mm Color Straw",
           "pack": "200*8 Bags",
@@ -1242,7 +1242,7 @@ export const catalog = {
           "image": "/assets/catalog/item-141.png"
         },
         {
-          "no": 142,
+          "no": 149,
           "sku": "STRAWS",
           "name": "7.75\" Clear Straight Jumbo Straws (Paper Wrapped)",
           "pack": "500*24 Bags",
@@ -1250,7 +1250,7 @@ export const catalog = {
           "image": "/assets/catalog/item-142.png"
         },
         {
-          "no": 143,
+          "no": 150,
           "sku": "PSS-74260",
           "name": "10.25\" Plastic Giant Straws (Paper Wrapped)",
           "pack": "300PCS *4BOXE S",
@@ -1258,15 +1258,15 @@ export const catalog = {
           "image": "/assets/catalog/item-143.png"
         },
         {
-          "no": 144,
+          "no": 151,
           "sku": "STRAWC",
           "name": "9x7mm Red Straw",
           "pack": "300*24 Bags",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-144.png"
         },
         {
-          "no": 145,
+          "no": 152,
           "sku": "BC-5522RI",
           "name": "22CM×0.55CM Bamboo Chopsticks Individually Wrapped (Round)",
           "pack": "1600 PCS",
@@ -1274,7 +1274,7 @@ export const catalog = {
           "image": "/assets/catalog/item-145.png"
         },
         {
-          "no": 146,
+          "no": 153,
           "sku": "TC01",
           "name": "23CM Bamboo Chopsticks Paper Warpped (Twin)",
           "pack": "1400 PCS",
@@ -1282,7 +1282,7 @@ export const catalog = {
           "image": "/assets/catalog/item-146.png"
         },
         {
-          "no": 147,
+          "no": 154,
           "sku": "BC-4823T",
           "name": "23CM Bamboo Chopsticks Paper Warpped (Twin)",
           "pack": "2000 PCS",
@@ -1290,7 +1290,7 @@ export const catalog = {
           "image": "/assets/catalog/item-147.png"
         },
         {
-          "no": 148,
+          "no": 155,
           "sku": "2.5G SPOON",
           "name": "PP2.5g White Soup Spoon， 1000BULK",
           "pack": "1000 PCS",
@@ -1298,7 +1298,7 @@ export const catalog = {
           "image": "/assets/catalog/item-148.png"
         },
         {
-          "no": 149,
+          "no": 156,
           "sku": "2.5G FORK",
           "name": "PP2.5g White FORK，1000BULK",
           "pack": "1000 PCS",
@@ -1306,7 +1306,7 @@ export const catalog = {
           "image": "/assets/catalog/item-149.png"
         },
         {
-          "no": 150,
+          "no": 157,
           "sku": "5G SPOON",
           "name": "PP5.0g White Plastic Soup Spoon (Extra Heavy)",
           "pack": "1000 PCS",
@@ -1314,7 +1314,7 @@ export const catalog = {
           "image": "/assets/catalog/item-150.png"
         },
         {
-          "no": 151,
+          "no": 158,
           "sku": "5G FORK",
           "name": "PP5.4g White Plastic Fork (Heavy Weight)",
           "pack": "1000 PCS",
@@ -1322,7 +1322,7 @@ export const catalog = {
           "image": "/assets/catalog/item-151.png"
         },
         {
-          "no": 152,
+          "no": 159,
           "sku": "PP5.4g Black Tea Spoon",
           "name": "PP5.4g Black Plastic Tea Spoon (Heavy Weight)",
           "pack": "1000 PCS",
@@ -1330,7 +1330,7 @@ export const catalog = {
           "image": "/assets/catalog/item-152.png"
         },
         {
-          "no": 153,
+          "no": 160,
           "sku": "PP5.4g Black Fork",
           "name": "PP5.4g Black Plastic Fork (Heavy Weight)",
           "pack": "1000 PCS",
@@ -1338,7 +1338,7 @@ export const catalog = {
           "image": "/assets/catalog/item-153.png"
         },
         {
-          "no": 154,
+          "no": 161,
           "sku": "PP5.0g Extra Heavy Black Soup Spoon",
           "name": "PP5.0g Black Plastic Soup Spoon (Extra Heavy)",
           "pack": "1000 PCS",
@@ -1346,7 +1346,7 @@ export const catalog = {
           "image": "/assets/catalog/item-154.png"
         },
         {
-          "no": 155,
+          "no": 162,
           "sku": "HWPTS- 5IW",
           "name": "Heavy Weight White Plastic Tea Spoon Individually Wrapped",
           "pack": "1000PCS",
@@ -1354,7 +1354,7 @@ export const catalog = {
           "image": "/assets/catalog/item-155.png"
         },
         {
-          "no": 156,
+          "no": 163,
           "sku": "HWPF-5IW",
           "name": "Heavy Weight White Plastic Fork Individually Wrapped",
           "pack": "1000PCS",
@@ -1362,7 +1362,7 @@ export const catalog = {
           "image": "/assets/catalog/item-156.png"
         },
         {
-          "no": 157,
+          "no": 164,
           "sku": "6 in1 Cutlery Kit (BLACK)",
           "name": "Heavy Duty Black Fork+spoon+knife+ Salt+pepper+napkin",
           "pack": "250 Sets",
@@ -1370,7 +1370,7 @@ export const catalog = {
           "image": "/assets/catalog/item-157.png"
         },
         {
-          "no": 158,
+          "no": 165,
           "sku": "3 In1 Cutlery Kit (BLACK)",
           "name": "Heavy Duty Black Fork+ Soup Spoon+napkin",
           "pack": "250 Sets",
@@ -1378,7 +1378,7 @@ export const catalog = {
           "image": "/assets/catalog/item-158.png"
         },
         {
-          "no": 159,
+          "no": 166,
           "sku": "5 in1 Cutlery Kit (BLACK)",
           "name": "Heavy Duty Black Fork+knife+salt+ Pepper+napkin",
           "pack": "500 Sets",
@@ -1393,7 +1393,7 @@ export const catalog = {
       "slug": "napkins-paper-towels",
       "items": [
         {
-          "no": 161,
+          "no": 167,
           "sku": "#1517",
           "name": "Dinner Napkin 2-PLY 15\"×17\"",
           "pack": "3000 PCS",
@@ -1401,7 +1401,7 @@ export const catalog = {
           "image": "/assets/catalog/item-161.png"
         },
         {
-          "no": 162,
+          "no": 168,
           "sku": "#4832",
           "name": "Dinner Napkins 2-Ply, White Paper",
           "pack": "3000 PCS",
@@ -1409,7 +1409,7 @@ export const catalog = {
           "image": "/assets/catalog/item-162.png"
         },
         {
-          "no": 163,
+          "no": 169,
           "sku": "CP- TFN10000",
           "name": "Tall Fold Napkin 1-PLY 13\"×6.7 \"",
           "pack": "10000 PCS",
@@ -1417,7 +1417,7 @@ export const catalog = {
           "image": "/assets/catalog/item-163.png"
         },
         {
-          "no": 164,
+          "no": 170,
           "sku": "#4700",
           "name": "Multifold Paper Towels Brown 1- ply 9 \"×9\"",
           "pack": "4000 PCS",
@@ -1425,7 +1425,7 @@ export const catalog = {
           "image": "/assets/catalog/item-164.png"
         },
         {
-          "no": 165,
+          "no": 171,
           "sku": "#4863",
           "name": "Interfold Napkins White, 2-Ply",
           "pack": "6000PCS",
@@ -1433,7 +1433,7 @@ export const catalog = {
           "image": "/assets/catalog/item-165.png"
         },
         {
-          "no": 166,
+          "no": 172,
           "sku": "#4786",
           "name": "Hard Wound Roll Towel 1-Ply, Bleached 8\"x600",
           "pack": "12RLS/PCS",
@@ -1441,7 +1441,7 @@ export const catalog = {
           "image": "/assets/catalog/item-166.png"
         },
         {
-          "no": 171,
+          "no": 173,
           "sku": "MFT-4000",
           "name": "Multifold Paper Towels Brown 1- ply 9 \"×9\"",
           "pack": "4000CT/CTN",
@@ -1449,7 +1449,7 @@ export const catalog = {
           "image": "/assets/catalog/item-171.png"
         },
         {
-          "no": 172,
+          "no": 174,
           "sku": "#4610",
           "name": "Jumbo Roll Tissue 2-Ply 3.5\"×1000",
           "pack": "12RLS/PCS",
@@ -1464,7 +1464,7 @@ export const catalog = {
       "slug": "restroom-gloves-ppe",
       "items": [
         {
-          "no": 160,
+          "no": 175,
           "sku": "THERMAL PAPER",
           "name": "3 1/8\" x 230' Thermal Paper Roll BPA Free",
           "pack": "50 PCS",
@@ -1472,7 +1472,7 @@ export const catalog = {
           "image": "/assets/catalog/item-160.png"
         },
         {
-          "no": 167,
+          "no": 176,
           "sku": "#4500",
           "name": "Toilet Seat Cover 100% Virgin Wood Pulp, Full Size",
           "pack": "20pk/250pc",
@@ -1480,7 +1480,7 @@ export const catalog = {
           "image": "/assets/catalog/item-167.png"
         },
         {
-          "no": 168,
+          "no": 177,
           "sku": "#4603",
           "name": "Bathroom Tissue 2-Ply, Embossed",
           "pack": "4pk/24roll",
@@ -1488,7 +1488,7 @@ export const catalog = {
           "image": "/assets/catalog/item-168.png"
         },
         {
-          "no": 169,
+          "no": 178,
           "sku": "#4331",
           "name": "Face Mask Ear Loop, 3 ply 99.5% Filtration Black",
           "pack": "20x50/bx",
@@ -1496,7 +1496,7 @@ export const catalog = {
           "image": "/assets/catalog/item-169.png"
         },
         {
-          "no": 170,
+          "no": 179,
           "sku": "#4321",
           "name": "Bouffant Cap Non-woven, 21” 1000 Pack White",
           "pack": "10x100/bg",
@@ -1504,7 +1504,7 @@ export const catalog = {
           "image": "/assets/catalog/item-170.png"
         },
         {
-          "no": 173,
+          "no": 180,
           "sku": "#6342",
           "name": "Nitrile Disposable Examination Gloves, Small 4MIL",
           "pack": "100PCS 10BOXE S",
@@ -1512,7 +1512,7 @@ export const catalog = {
           "image": "/assets/catalog/item-173.png"
         },
         {
-          "no": 174,
+          "no": 181,
           "sku": "#6343",
           "name": "Nitrile Disposable Examination Gloves Medium 4MIL",
           "pack": "100PCS 10BOXE S",
@@ -1520,7 +1520,7 @@ export const catalog = {
           "image": "/assets/catalog/item-174.png"
         },
         {
-          "no": 175,
+          "no": 182,
           "sku": "#6344",
           "name": "Nitrile Disposable Examination Gloves Large 4MIL",
           "pack": "100PCS 10BOXE S",
@@ -1528,7 +1528,7 @@ export const catalog = {
           "image": "/assets/catalog/item-175.png"
         },
         {
-          "no": 176,
+          "no": 183,
           "sku": "#6345",
           "name": "Nitrile Disposable Examination Gloves Extra Large MIL",
           "pack": "100PCS 10BOXE S",
@@ -1536,7 +1536,7 @@ export const catalog = {
           "image": "/assets/catalog/item-176.png"
         },
         {
-          "no": 177,
+          "no": 184,
           "sku": "",
           "name": "Disposable Food Service HDPE Gloves (One Size)",
           "pack": "100PCS 10BOXE S",
@@ -1551,7 +1551,7 @@ export const catalog = {
       "slug": "bags-can-liners",
       "items": [
         {
-          "no": 178,
+          "no": 185,
           "sku": "#1BAG",
           "name": "S T-SHIRT Carry Out Bags 8\"×6\"×16\" 12.5 MIC",
           "pack": "700BAG S/PCS",
@@ -1559,7 +1559,7 @@ export const catalog = {
           "image": "/assets/catalog/item-178.png"
         },
         {
-          "no": 179,
+          "no": 186,
           "sku": "#3BAG",
           "name": "M T-SHIRT Carry Out Bags 10.5\"×6\"×20\" 15 MIC",
           "pack": "700BAG S/PCS",
@@ -1567,7 +1567,7 @@ export const catalog = {
           "image": "/assets/catalog/item-179.png"
         },
         {
-          "no": 180,
+          "no": 187,
           "sku": "#5BAG",
           "name": "L T-SHIRT Carry Out Bags 12\"×7\"×22\" 17 MIC",
           "pack": "400BAG S/PCS",
@@ -1575,7 +1575,7 @@ export const catalog = {
           "image": "/assets/catalog/item-180.png"
         },
         {
-          "no": 181,
+          "no": 188,
           "sku": "#7BAG",
           "name": "Xl T-SHIRT Carry Out Bags 15\"×7\"×26\" 17 MIC",
           "pack": "400BAG S/PCS",
@@ -1583,7 +1583,7 @@ export const catalog = {
           "image": "/assets/catalog/item-181.png"
         },
         {
-          "no": 182,
+          "no": 189,
           "sku": "CY-SB8",
           "name": "8 lbs Kraft Paper Bag 6\"*4.1\"*12.6\"",
           "pack": "1000PCS/CTN",
@@ -1591,7 +1591,7 @@ export const catalog = {
           "image": "/assets/catalog/item-182.png"
         },
         {
-          "no": 183,
+          "no": 190,
           "sku": "CY-SB10",
           "name": "10 lbs Kraft Paper Bag 6.3\"*4.2\"*13.4\"",
           "pack": "1000PCS/CTN",
@@ -1599,7 +1599,7 @@ export const catalog = {
           "image": "/assets/catalog/item-183.png"
         },
         {
-          "no": 184,
+          "no": 191,
           "sku": "CY-SB16",
           "name": "16 lbs Kraft Paper Bag 7.7\"*4.7\"*16\"",
           "pack": "500PCS/CTN",
@@ -1607,7 +1607,7 @@ export const catalog = {
           "image": "/assets/catalog/item-184.png"
         },
         {
-          "no": 185,
+          "no": 192,
           "sku": "CY-SB20",
           "name": "20 lbs Kraft Paper Bag 8.2\"*5.3\"*16.1\"",
           "pack": "500PCS/CTN",
@@ -1615,7 +1615,7 @@ export const catalog = {
           "image": "/assets/catalog/item-185.png"
         },
         {
-          "no": 186,
+          "no": 193,
           "sku": "KPB05",
           "name": "#5 Kraft Paper Bag with Twist Handle 10\"*6.75\"*12\"",
           "pack": "250PCS/CTN",
@@ -1623,7 +1623,7 @@ export const catalog = {
           "image": "/assets/catalog/item-186.png"
         },
         {
-          "no": 187,
+          "no": 194,
           "sku": "KPB10",
           "name": "100 #10 Kraft Paper Bag with Twist Handle 13\"*7\"*13\" 100gms",
           "pack": "250PCS/CTN",
@@ -1631,7 +1631,7 @@ export const catalog = {
           "image": "/assets/catalog/item-187.png"
         },
         {
-          "no": 188,
+          "no": 195,
           "sku": "KPB14",
           "name": "#14 Kraft Paper Bag with Twist Handle 14\"*10\"*15.5\"",
           "pack": "250PCS/CTN",
@@ -1639,7 +1639,7 @@ export const catalog = {
           "image": "/assets/catalog/item-188.png"
         },
         {
-          "no": 189,
+          "no": 196,
           "sku": "B01",
           "name": "120 B01 LD Clear 11x19, 1.25Mil, NW8.00lbs",
           "pack": "460pcs",
@@ -1647,7 +1647,7 @@ export const catalog = {
           "image": "/assets/catalog/item-189.png"
         },
         {
-          "no": 190,
+          "no": 197,
           "sku": "B02",
           "name": "B02 LD Clear 11x14, 1.25Mil, NW8.00lbs",
           "pack": "620pcs",
@@ -1655,7 +1655,7 @@ export const catalog = {
           "image": "/assets/catalog/item-190.png"
         },
         {
-          "no": 191,
+          "no": 198,
           "sku": "B05",
           "name": "B05 HD Clear 11x14, 12Mic, NW8.00lbs",
           "pack": "3600pcs",
@@ -1663,7 +1663,7 @@ export const catalog = {
           "image": "/assets/catalog/item-191.png"
         },
         {
-          "no": 192,
+          "no": 199,
           "sku": "4003",
           "name": "13 Gallons Trash Bags 24\"×24\"1.6MIL",
           "pack": "500BAG S/PCS",
@@ -1671,7 +1671,7 @@ export const catalog = {
           "image": "/assets/catalog/item-192.png"
         },
         {
-          "no": 193,
+          "no": 200,
           "sku": "HRV242 406N",
           "name": "8-10 Gallon HDPE Can Liner 24\" x 24\" 6 MIC Natural",
           "pack": "50Bags/Roll 20Rolls/Ctn",
@@ -1679,7 +1679,7 @@ export const catalog = {
           "image": "/assets/catalog/item-193.png"
         },
         {
-          "no": 194,
+          "no": 201,
           "sku": "HRV307 10N",
           "name": "20-30 Gallon HDPE Can Liner 30\" x 37\" 10 MIC Natural",
           "pack": "25Bags/Roll 20Rolls/Ctn",
@@ -1687,7 +1687,7 @@ export const catalog = {
           "image": "/assets/catalog/item-194.png"
         },
         {
-          "no": 195,
+          "no": 202,
           "sku": "C23",
           "name": "13 Gallons Trash Bags 24\"×32\"0.8 MIL",
           "pack": "500BAG S/PCS",
@@ -1695,7 +1695,7 @@ export const catalog = {
           "image": "/assets/catalog/item-195.png"
         },
         {
-          "no": 196,
+          "no": 203,
           "sku": "C35",
           "name": "33 Gallons Trash Bags 33\"×39\"1.3 MIL",
           "pack": "200BAG S/PCS",
@@ -1703,7 +1703,7 @@ export const catalog = {
           "image": "/assets/catalog/item-196.png"
         },
         {
-          "no": 197,
+          "no": 204,
           "sku": "A92",
           "name": "45 Gallons Trash Bags 40''×46''1.5 MIL",
           "pack": "100BAG S/PCS",
@@ -1711,7 +1711,7 @@ export const catalog = {
           "image": "/assets/catalog/item-197.png"
         },
         {
-          "no": 198,
+          "no": 205,
           "sku": "C36",
           "name": "55 Gallons Trash Bags 36\"×58\" 1.5 MIL",
           "pack": "100BAG S/PCS",
@@ -1778,7 +1778,7 @@ export const catalog = {
           "sku": "HALF-S",
           "name": "Half Steam Shallow Pan (40Gague) Top Out: 322*262 Top in : 298*238 Base : 260*200 Height : 42",
           "pack": "100 PCS",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-212.png"
         },
         {
@@ -1810,7 +1810,7 @@ export const catalog = {
           "sku": "FULL-S",
           "name": "Full Steam Shallow Pan",
           "pack": "50 PCS",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-216.png"
         },
         {
@@ -1818,7 +1818,7 @@ export const catalog = {
           "sku": "FULL-M",
           "name": "Full Steam Medium Pan (54Gague) Top Out: 523*327 Top in : 493*297Base : 452*253 Height : 81",
           "pack": "50 PCS",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-217.png"
         },
         {
@@ -1826,7 +1826,7 @@ export const catalog = {
           "sku": "FULL-L",
           "name": "Full Steam Deep Pan (70Gague) Top Out: 523*327 Top in : 493*297Base : 452*253 Height : 81",
           "pack": "50 PCS",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-218.png"
         },
         {
@@ -1834,7 +1834,7 @@ export const catalog = {
           "sku": "FULL-LID",
           "name": "Full Steam Foil Lid Top Out: 536*340 Height : 19",
           "pack": "50 PCS",
-          "price": null,
+          "price": "",
           "image": "/assets/catalog/item-219.png"
         }
       ],

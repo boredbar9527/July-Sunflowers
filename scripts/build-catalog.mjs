@@ -1,56 +1,33 @@
-// Generates src/data/products.json from data/catalog.csv.
-// Runs automatically before `npm run dev` and `npm run build`, so the CSV
-// is the single source of truth for product data — no database needed.
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+// Generates src/catalog.js from data/catalog.csv.
+// Runs automatically before `npm run dev` and `npm run build`, and after every
+// admin edit, so the CSV is the single source of truth for product data —
+// no database needed. The output shape is exactly what src/main.js consumes:
+//
+//   export const catalog = {
+//     generatedFrom, total,
+//     groups: [ { name, slug, count, items: [ { no, sku, name, pack, price, image } ] } ]
+//   }
+//
+// Products are grouped by their CSV `category`; the group heading is the
+// `category_label`. Group order and item order follow the CSV row order.
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCsv } from "./csv-utils.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const csvPath = join(root, "data", "catalog.csv");
-const outPath = join(root, "src", "data", "products.json");
-const productImgDir = join(root, "public", "assets", "products");
+const outPath = join(root, "src", "catalog.js");
 
-// A "visual family" is a group of products that look the same and differ only
-// by size (e.g. 12/16/24 oz of the same container). Dropping ONE photo named
-// <family>.jpg|png|webp into public/assets/products/ makes every product in
-// that family use it — no CSV edits, and it rolls out progressively.
-function familySlug(category, name) {
-  const s = name.toLowerCase();
-  let mat = "plastic";
-  if (s.includes("kraft")) mat = "kraft";
-  else if (s.includes("bamboo")) mat = "bamboo";
-  else if (s.includes("foam")) mat = "foam";
-  else if (s.includes("aluminum") || s.includes("foil")) mat = "foil";
-  else if (s.includes("paper") || s.includes("tissue")) mat = "paper";
-
-  let type = "item";
-  for (const k of [
-    "hinged", "clamshell", "container", "sleeve", "carrier", "t-shirt", "bag",
-    "cup", "lid", "tray", "chopstick", "fork", "spoon", "knife", "straw",
-    "napkin", "plate", "glove", "wrap", "foil", "tissue", "portion", "boat"
-  ]) {
-    if (s.includes(k)) { type = k === "t-shirt" ? "tshirt" : k; break; }
-  }
-
-  let shape = "";
-  if (s.includes("rectangular")) shape = "rect";
-  else if (s.includes("round")) shape = "round";
-  else if (s.includes("square")) shape = "square";
-
-  return [category, mat, type, shape].filter(Boolean).join("-");
-}
-
-// Return the web path to a family image if a file exists on disk, else null.
-function familyImage(category, name) {
-  const slug = familySlug(category, name);
-  for (const ext of ["jpg", "jpeg", "png", "webp", "svg"]) {
-    if (existsSync(join(productImgDir, `${slug}.${ext}`))) {
-      return `/assets/products/${slug}.${ext}`;
-    }
-  }
-  return null;
-}
+// Neutral inline placeholder for listings added without an image yet.
+const PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">' +
+      '<rect width="400" height="400" fill="#f2efe6"/>' +
+      '<text x="50%" y="50%" fill="#b7ad97" font-family="sans-serif" font-size="22" ' +
+      'text-anchor="middle" dominant-baseline="middle">No image</text></svg>'
+  );
 
 const rows = parseCsv(readFileSync(csvPath, "utf8"));
 const header = rows.shift();
@@ -59,49 +36,42 @@ if (header.join(",") !== expected) {
   throw new Error(`Unexpected CSV header: ${header.join(",")}`);
 }
 
-const accents = ["sky", "leaf", "sand", "sun"];
-const slugs = new Set();
+const groupsBySlug = new Map(); // slug -> { name, slug, items: [] }
+let no = 0;
 
-const products = rows.map((cols, index) => {
-  const [sku, name, category, categoryLabel, unit, price, image, heroImage, story, badge, hoverImage] = cols;
-
-  let slug = sku.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "") || "item";
-  const base = slug;
-  for (let n = 2; slugs.has(slug); n++) slug = `${base}-${n}`;
-  slugs.add(slug);
-
-  // Image priority: explicit CSV value → per-SKU photo (dropped into
-  // public/assets/products/sku/<slug>.<ext> by sync-sku-images.mjs) → shared
-  // family photo → category illustration as the last-resort fallback.
-  let skuImg = null;
-  for (const ext of ["png", "jpg", "jpeg", "webp"]) {
-    if (existsSync(join(productImgDir, "sku", `${slug}.${ext}`))) {
-      skuImg = `/assets/products/sku/${slug}.${ext}`;
-      break;
-    }
+for (const cols of rows) {
+  const [sku, name, category, categoryLabel, unit, price] = cols;
+  const image = cols[6];
+  const slug = String(category || "").trim() || "uncategorized";
+  if (!groupsBySlug.has(slug)) {
+    groupsBySlug.set(slug, {
+      name: String(categoryLabel || "").trim() || slug,
+      slug,
+      items: []
+    });
   }
-  const familyImg = familyImage(category, name);
-  const fallback = skuImg || familyImg || `/assets/categories/${category}.svg`;
-  return {
-    id: slug,
-    sku,
-    name,
-    category,
-    categoryLabel,
-    family: familySlug(category, name),
-    mood: unit ? `Sold per case of ${unit}` : "",
-    price: price ? Number(price) : null,
-    image: image || fallback,
-    hoverImage: hoverImage || "",
-    heroImage: heroImage || image || skuImg || familyImg || `/assets/categories/${category}.svg`,
-    description: "",
-    story,
-    badge: badge || "",
-    specs: unit ? [`Case: ${unit}`] : [],
-    accent: accents[index % accents.length]
-  };
-});
+  const priceStr = String(price || "").trim();
+  groupsBySlug.get(slug).items.push({
+    no: ++no,
+    sku: String(sku || "").trim(),
+    name: String(name || "").trim(),
+    pack: String(unit || "").trim(),
+    price: priceStr === "" ? "" : Number(priceStr).toFixed(2),
+    image: String(image || "").trim() || PLACEHOLDER
+  });
+}
+
+const groups = [...groupsBySlug.values()].map((g) => ({ ...g, count: g.items.length }));
+const catalog = {
+  generatedFrom: "data/catalog.csv",
+  total: no,
+  groups
+};
+
+const banner =
+  "// Auto-generated from data/catalog.csv by scripts/build-catalog.mjs.\n" +
+  "// Do not edit by hand — edit the catalog through `npm run admin` instead.\n";
 
 mkdirSync(dirname(outPath), { recursive: true });
-writeFileSync(outPath, JSON.stringify(products, null, 2) + "\n");
-console.log(`Wrote ${products.length} products to src/data/products.json`);
+writeFileSync(outPath, `${banner}export const catalog = ${JSON.stringify(catalog, null, 2)};\n`);
+console.log(`Wrote ${no} products in ${groups.length} categories to src/catalog.js`);

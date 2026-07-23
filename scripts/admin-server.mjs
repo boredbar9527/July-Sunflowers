@@ -34,8 +34,12 @@ async function git(...args) {
 }
 
 // Only these paths are ever published by the admin — code changes stay out.
+// data/catalog.csv is the source of truth; src/catalog.js is the generated
+// data the storefront actually imports, so both are pushed together.
 const PUBLISH_PATHS = [
   "data/catalog.csv",
+  "src/catalog.js",
+  "public/assets/catalog",
   "public/assets/products",
   "src/data/settings.json"
 ];
@@ -70,7 +74,7 @@ function saveRows(rows) {
     }
     throw err;
   }
-  // Regenerate products.json so a running vite dev server picks it up.
+  // Regenerate src/catalog.js so a running vite dev server picks it up.
   execFileSync(process.execPath, [join(root, "scripts", "build-catalog.mjs")], {
     stdio: "ignore"
   });
