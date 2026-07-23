@@ -2,6 +2,7 @@
 // it never bloats the initial bundle. Returns raw base64 (no data: prefix),
 // ready for Resend's attachment `content` field.
 import { CONTACT_EMAIL, STORE_ADDRESS, CONTACT_PHONE_DISPLAY } from "../config.js";
+import { LOGO_BASE64 } from "../data/logoData.js";
 
 const money = (v) =>
   v === null || v === undefined || v === "" || Number.isNaN(Number(v))
@@ -23,11 +24,17 @@ export async function buildInvoicePdf({ orderNumber, dateText, customer = {}, li
   const GRAY = [138, 151, 141];
   const INK = [31, 42, 36];
 
-  // Header
+  // Header — logo left, brand text beside it
+  try {
+    doc.addImage(`data:image/png;base64,${LOGO_BASE64}`, "PNG", M, 26, 40, 40);
+  } catch {
+    // A corrupt/unsupported image must never block the PO itself.
+  }
+  const TX = M + 50;
   doc.setFont("helvetica", "bold").setFontSize(18).setTextColor(...DARK);
-  doc.text("July Sunflowers", M, 48);
+  doc.text("July Sunflowers", TX, 48);
   doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...GRAY);
-  doc.text("WHOLESALE FOODSERVICE SUPPLY", M, 60);
+  doc.text("WHOLESALE FOODSERVICE SUPPLY", TX, 60);
   doc.setFont("helvetica", "bold").setFontSize(17).setTextColor(...GREEN);
   doc.text("PURCHASE ORDER", W - M, 50, { align: "right" });
   doc.setDrawColor(...GREEN).setLineWidth(2).line(M, 74, W - M, 74);

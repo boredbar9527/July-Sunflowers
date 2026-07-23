@@ -3,6 +3,8 @@
 // plugin (see vite.config.js) imports sendOrderEmail so it also works on
 // localhost. Secrets come from env vars — never from the client bundle.
 
+import { LOGO_BASE64 } from "../src/data/logoData.js";
+
 const money = (v) =>
   v === null || v === undefined || v === "" || Number.isNaN(Number(v))
     ? "On request"
@@ -44,7 +46,8 @@ export function buildEmailHtml({ orderNumber, dateText, customer = {}, lines = [
   <table role="presentation" width="640" align="center" cellpadding="0" cellspacing="0" style="width:640px;max-width:96%;margin:0 auto;background:#fff;border:1px solid #e2e6e2;border-radius:12px;overflow:hidden;">
     <tr><td style="background:#234d27;padding:18px 24px;">
       <table role="presentation" width="100%"><tr>
-        <td style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.01em;">July Sunflowers <span style="font-weight:400;font-size:12px;color:#bcd6bd;">Wholesale Foodservice Supply</span></td>
+        <td style="width:52px;vertical-align:middle;"><img src="cid:jslogo" width="44" height="44" alt="July Sunflowers logo" style="display:block;border-radius:8px;background:#fff;" /></td>
+        <td style="color:#fff;font-size:20px;font-weight:800;letter-spacing:-.01em;padding-left:10px;">July Sunflowers <span style="font-weight:400;font-size:12px;color:#bcd6bd;">Wholesale Foodservice Supply</span></td>
         <td style="text-align:right;color:#ffd9ac;font-size:18px;font-weight:800;letter-spacing:2px;">PURCHASE ORDER</td>
       </tr></table>
     </td></tr>
@@ -112,9 +115,14 @@ export async function sendOrderEmail(payload, { apiKey, to, from }) {
   const html = buildEmailHtml(payload);
   const subject = `New order ${payload.orderNumber} — ${payload.customer?.name || "Website"}`;
 
-  const attachments = payload.pdfBase64
-    ? [{ filename: `${payload.orderNumber || "order"}.pdf`, content: payload.pdfBase64 }]
-    : undefined;
+  // The logo rides along as an inline attachment (cid:jslogo) so it renders in
+  // Gmail and other clients that block remote/data-URI images.
+  const attachments = [
+    { filename: "logo.png", content: LOGO_BASE64, content_id: "jslogo" }
+  ];
+  if (payload.pdfBase64) {
+    attachments.push({ filename: `${payload.orderNumber || "order"}.pdf`, content: payload.pdfBase64 });
+  }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -144,7 +152,7 @@ export default async function handler(req, res) {
       typeof req.body === "object" && req.body ? req.body : JSON.parse(req.body || "{}");
     await sendOrderEmail(payload, {
       apiKey: process.env.RESEND_API_KEY,
-      to: process.env.ORDER_EMAIL || "defrifegapratama002@gmail.com",
+      to: process.env.ORDER_EMAIL || "info@jsf2024.com",
       from: process.env.ORDER_FROM || "July Sunflowers <onboarding@resend.dev>"
     });
     res.status(200).json({ ok: true });

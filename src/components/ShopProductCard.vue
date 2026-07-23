@@ -88,13 +88,13 @@ const artTitle = computed(() => badge.value || props.product.categoryLabel);
       <p class="pcard__case" v-if="packInfo">{{ packInfo }} per case</p>
 
       <div class="pcard__actions">
-        <div v-if="inCart" class="qty-stepper qty-stepper--card">
+        <div v-if="inCart" class="sv-qty">
           <button type="button" @click="setQty(product.id, inCart - 1)" aria-label="Decrease">−</button>
           <span>{{ inCart }}</span>
           <button type="button" @click="setQty(product.id, inCart + 1)" aria-label="Increase">+</button>
         </div>
         <button
-          class="btn btn--cart"
+          class="sv-btn sv-btn--cart"
           type="button"
           @click="add(product.id)"
         >

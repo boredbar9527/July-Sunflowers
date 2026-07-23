@@ -18,7 +18,7 @@ const productImgDir = join(root, "public", "assets", "products");
 const promosPath = join(root, "src", "data", "promos.json");
 const promoImgDir = join(root, "public", "assets", "promos");
 const settingsPath = join(root, "src", "data", "settings.json");
-const PORT = 5174;
+const PORT = Number(process.env.ADMIN_PORT) || 5177;
 
 // Contact/biodata fields the admin is allowed to edit.
 const SETTINGS_FIELDS = [

@@ -1,5 +1,6 @@
 // Syncs per-SKU product photos from the master folder into the site.
-// Source of truth: D:\Fega\extra_pic\asset_new (files named "SKU - DETAILS.ext").
+// Source of truth: D:\Fega\extra_pic\asset_june3 (files named "SKU - DETAILS.ext",
+// one file per catalog product from the June 3 price list).
 // Matching: by SKU prefix first, then by the details part vs product name.
 // Copies into public/assets/products/sku/<product-slug>.<ext>, then you run
 // `npm run catalog` (or just `npm run dev`) to pick the changes up.
@@ -9,7 +10,7 @@ import { readdirSync, rmSync, mkdirSync, copyFileSync, readFileSync } from "node
 import { join, extname, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const SOURCE = "D:/Fega/extra_pic/asset_new";
+const SOURCE = "D:/Fega/extra_pic/asset_june3";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const products = JSON.parse(readFileSync(join(root, "src", "data", "products.json"), "utf8"));
@@ -26,7 +27,23 @@ const ALIAS = {
   "CY-KTB2": "Carton 2#",
   "CY-KTB3": "Carton 3#",
   "CY-KTB4": "Carton 4#",
-  "CY-KTB8": "Carton 8#"
+  "CY-KTB8": "Carton 8#",
+  // asset_june3 filenames that use a longer/variant code than the catalog SKU.
+  "WH05": "WH05 (BOPS)",
+  "WH06": "WH06 (BOPS)",
+  "WH81": "WH81 (BOPS)",
+  "WH91": "WH91 (BOPS)",
+  "0.75-1oz lids": "0.75-1oz fit lids",
+  "1.5-2oz lids": "1.5-2oz fit lids",
+  "3.25-5.5oz lids": "3.25-5.5oz fit lids",
+  "32oz-107mm": "32 oz-107mmCUP",
+  "PP5.0g Black Soup Spoon": "PP5.0g Extra Heavy Black Soup Spoon",
+  "3-in-1 Kit Black": "3 In 1 Cutlery Kit (BLACK)",
+  "5-in-1 Kit Black": "5 in 1 Cutlery Kit (BLACK)",
+  "6-in-1 Kit Black": "6 in 1 Cutlery Kit (BLACK)",
+  "YH-HG-2000": "FOOD SERVICE HDPE GLOVES (ONE SIZ",
+  "9AL-SHEET": "9ALUMINUM SHEET",
+  "12AL-SHEET": "12ALUMINUM SHEET"
 };
 
 const skuMap = new Map();

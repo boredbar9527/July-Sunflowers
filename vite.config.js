@@ -17,7 +17,7 @@ function orderApiDev(env) {
             const { sendOrderEmail } = await server.ssrLoadModule("/api/order.js");
             await sendOrderEmail(JSON.parse(raw || "{}"), {
               apiKey: env.RESEND_API_KEY,
-              to: env.ORDER_EMAIL || "defrifegapratama002@gmail.com",
+              to: env.ORDER_EMAIL || "info@jsf2024.com",
               from: env.ORDER_FROM || "July Sunflowers <onboarding@resend.dev>"
             });
             res.statusCode = 200;
@@ -36,5 +36,8 @@ function orderApiDev(env) {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  return { plugins: [vue(), orderApiDev(env)] };
+  return {
+    plugins: [vue(), orderApiDev(env)],
+    server: { port: 5176, strictPort: true }
+  };
 });
