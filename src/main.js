@@ -1,105 +1,6 @@
 import "./styles.css";
-
-const products = [
-  {
-    id: "f-10",
-    sku: "F-10",
-    name: "Facial Tissue 10-Pack",
-    category: "facial",
-    categoryLabel: "Facial Tissue",
-    mood: "Daily carry",
-    image: "/assets/facial-tissue-10-group-BRAQAcc1.png",
-    heroImage: "/assets/introA-D1LV2l4Y.png",
-    description:
-      "A compact facial tissue format built for desks, cars, hospitality counters, and everyday grab-and-go use.",
-    story:
-      "Soft 3-ply facial tissue that keeps the brand feeling bright and premium even in a smaller footprint.",
-    specs: ["10 packs", "3-ply", "110 sheets each", "174 mm x 175 mm"],
-    accent: "sky"
-  },
-  {
-    id: "fb-24",
-    sku: "FB-24",
-    name: "Facial Tissue 24-Pack",
-    category: "facial",
-    categoryLabel: "Facial Tissue",
-    mood: "High-volume restock",
-    image: "/assets/facial-tissue-24-box-CQ2iBBkn.png",
-    heroImage: "/assets/facial-tissue-24-C_T9WZKX.png",
-    description:
-      "A case-sized facial tissue option for offices, retail shelves, and larger home restocks.",
-    story:
-      "The larger case format keeps the kraft-box feel while giving the category a more confident warehouse-to-home presence.",
-    specs: ["24 packs", "3-ply", "110 sheets each", "174 mm x 175 mm"],
-    accent: "leaf"
-  },
-  {
-    id: "b-24",
-    sku: "B-24",
-    name: "Bath Tissue 24-Roll Box",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Family-size staple",
-    image: "/assets/bath-tissue-24-box-group-CognT1FQ.png",
-    heroImage: "/assets/bath-tissue-24-group-CzUg8Czx.png",
-    description:
-      "A strong, absorbent septic-safe bath tissue format designed for pantry shelves, family homes, and recurring stock-up trips.",
-    story:
-      "This is the lead bath tissue format: soft in use, graphic on shelf, and sturdy enough to feel premium instead of disposable.",
-    specs: [
-      "24 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "3.94 in x 4.72 in",
-      "Total 774.96 sq ft"
-    ],
-    accent: "sand"
-  },
-  {
-    id: "b-6",
-    sku: "B-6",
-    name: "Bath Tissue 6-Roll Pack",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Compact household pack",
-    image: "/assets/bath-tissue-6-group-D-ix8T_C.png",
-    heroImage: "/assets/bath-tissue-6-CAS3RIMa.png",
-    description:
-      "A smaller bath tissue pack for apartments, guest bathrooms, and lighter weekly restocks.",
-    story:
-      "The compact pack keeps the same softness and septic-safe story while fitting smaller spaces and smaller runs.",
-    specs: [
-      "6 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "3.94 in x 4.72 in",
-      "Total 193.71 sq ft"
-    ],
-    accent: "sun"
-  },
-  {
-    id: "bb-24",
-    sku: "BB-24",
-    name: "Bath Tissue 24-Roll Bundle",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Bulk transparent pack",
-    image: "/assets/bath-tissue-24-box-6EgTFqhB.png",
-    heroImage: "/assets/bath-tissue-24-inner-BCsaK-kE.png",
-    description:
-      "A bulk-forward 24-roll bath tissue presentation for wholesale, backroom stocking, and value-conscious buyers.",
-    story:
-      "This bundle pushes the brand toward distribution-ready utility without losing the softer July Sunflowers tone.",
-    specs: [
-      "3 packs, transparent packaging",
-      "24 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "Total 774.96 sq ft"
-    ],
-    accent: "sky"
-  }
-];
+import { createApp } from "vue";
+import ShopApp from "./components/ShopApp.vue";
 
 const proofPoints = [
   {
@@ -154,6 +55,7 @@ app.innerHTML = `
         </nav>
 
         <a class="header-chip" href="mailto:info@jsf2024.com">info@jsf2024.com</a>
+        <span id="cart-slot"></span>
       </div>
     </header>
 
@@ -173,9 +75,7 @@ app.innerHTML = `
 
           <div class="hero__actions">
             <a class="button button--primary" href="#collections">Explore collections</a>
-            <button class="button button--secondary" type="button" data-open-product="fb-24">
-              Open featured case
-            </button>
+            <a class="button button--secondary" href="#collections">Browse the catalog</a>
           </div>
 
           <div class="hero__facts">
@@ -291,58 +191,9 @@ app.innerHTML = `
             <p class="eyebrow">Collection explorer</p>
             <h2>Choose the format that fits the room, routine, or run size.</h2>
           </div>
-
-          <div class="filters" role="tablist" aria-label="Product category filters">
-            <button class="filter-pill is-active" type="button" data-filter="all" aria-pressed="true">
-              All
-            </button>
-            <button class="filter-pill" type="button" data-filter="facial" aria-pressed="false">
-              Facial Tissue
-            </button>
-            <button class="filter-pill" type="button" data-filter="bath" aria-pressed="false">
-              Bath Tissue
-            </button>
-          </div>
         </div>
 
-        <div class="product-grid">
-          ${products
-            .map(
-              (product, index) => `
-                <article
-                  class="product-card product-card--${product.accent} ${index === 0 ? "product-card--wide" : ""}"
-                  data-category="${product.category}"
-                  data-product-card
-                  data-reveal
-                >
-                  <div class="product-card__meta">
-                    <span class="pill">${product.categoryLabel}</span>
-                    <strong>${product.sku}</strong>
-                  </div>
-                  <div class="product-card__body">
-                    <div class="product-card__copy">
-                      <span class="product-card__mood">${product.mood}</span>
-                      <h3>${product.name}</h3>
-                      <p>${product.description}</p>
-                      <ul class="spec-list">
-                        ${product.specs
-                          .slice(0, 3)
-                          .map((spec) => `<li>${spec}</li>`)
-                          .join("")}
-                      </ul>
-                      <button class="inline-button" type="button" data-open-product="${product.id}">
-                        View details
-                      </button>
-                    </div>
-                    <div class="product-card__visual">
-                      <img src="${product.image}" alt="${product.name}" />
-                    </div>
-                  </div>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
+        <div id="shop-root"></div>
       </section>
 
       <section class="story section" id="story">
@@ -417,142 +268,28 @@ app.innerHTML = `
       <p>Sunny softness. Pure joy.</p>
     </footer>
 
-    <div class="product-drawer" id="product-drawer" hidden aria-hidden="true">
-      <button class="product-drawer__backdrop" type="button" aria-label="Close product details"></button>
-      <aside class="product-drawer__panel" aria-labelledby="drawer-title">
-        <button class="product-drawer__close" type="button" aria-label="Close product details">Close</button>
-        <div class="product-drawer__media">
-          <div class="product-drawer__media-card">
-            <img id="drawer-image" src="" alt="" />
-          </div>
-        </div>
-        <div class="product-drawer__copy">
-          <p class="eyebrow" id="drawer-category"></p>
-          <h2 id="drawer-title"></h2>
-          <p class="product-drawer__story" id="drawer-story"></p>
-          <p class="product-drawer__description" id="drawer-description"></p>
-          <div class="product-drawer__specs" id="drawer-specs"></div>
-        </div>
-      </aside>
-    </div>
   </div>
 `;
 
-const drawer = document.querySelector("#product-drawer");
-const drawerImage = document.querySelector("#drawer-image");
-const drawerCategory = document.querySelector("#drawer-category");
-const drawerTitle = document.querySelector("#drawer-title");
-const drawerStory = document.querySelector("#drawer-story");
-const drawerDescription = document.querySelector("#drawer-description");
-const drawerSpecs = document.querySelector("#drawer-specs");
-const filterButtons = [...document.querySelectorAll("[data-filter]")];
-const productCards = [...document.querySelectorAll("[data-product-card]")];
 const menuToggle = document.querySelector(".menu-toggle");
 const siteNav = document.querySelector(".site-nav");
 const heroStage = document.querySelector(".hero__stage");
 
-function getProductById(id) {
-  return products.find((product) => product.id === id);
-}
-
-function getRouteProductId() {
-  const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
-  return match ? decodeURIComponent(match[1]).toLowerCase() : null;
-}
-
-function setFilter(nextFilter) {
-  filterButtons.forEach((button) => {
-    const active = button.dataset.filter === nextFilter;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
-
-  productCards.forEach((card) => {
-    const shouldShow =
-      nextFilter === "all" || card.dataset.category === nextFilter;
-    card.classList.toggle("is-hidden", !shouldShow);
-  });
-}
-
-function openDrawer(productId, pushState = true) {
-  const product = getProductById(productId);
-  if (!product) return;
-
-  drawerImage.src = product.heroImage;
-  drawerImage.alt = product.name;
-  drawerCategory.textContent = `${product.categoryLabel} / ${product.sku}`;
-  drawerTitle.textContent = product.name;
-  drawerStory.textContent = product.story;
-  drawerDescription.textContent = product.description;
-  drawerSpecs.innerHTML = product.specs
-    .map((spec) => `<span class="spec-chip">${spec}</span>`)
-    .join("");
-
-  drawer.hidden = false;
-  drawer.setAttribute("aria-hidden", "false");
-  document.body.classList.add("drawer-open");
-
-  if (pushState && window.location.pathname !== `/product/${product.id}`) {
-    window.history.pushState({ product: product.id }, "", `/product/${product.id}`);
-  }
-}
-
-function closeDrawer(pushState = true) {
-  drawer.hidden = true;
-  drawer.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("drawer-open");
-
-  if (pushState && window.location.pathname.startsWith("/product/")) {
-    window.history.pushState({}, "", "/");
-  }
-}
-
-function syncDrawerToLocation() {
-  const productId = getRouteProductId();
-  if (productId) {
-    openDrawer(productId, false);
-  } else {
-    closeDrawer(false);
-  }
-}
-
+// The category cards' "Filter facial/bath" buttons now simply lead to the
+// full catalog — the shop section owns its own category filtering.
 document.addEventListener("click", (event) => {
-  const openTrigger = event.target.closest("[data-open-product]");
-  if (openTrigger) {
-    openDrawer(openTrigger.dataset.openProduct);
-    return;
-  }
-
-  if (
-    event.target.closest(".product-drawer__close") ||
-    event.target.closest(".product-drawer__backdrop")
-  ) {
-    closeDrawer();
-    return;
-  }
-
-  const filterTrigger = event.target.closest("[data-filter]");
-  if (filterTrigger) {
-    setFilter(filterTrigger.dataset.filter);
-    return;
-  }
-
   const categoryTrigger = event.target.closest("[data-filter-select]");
   if (categoryTrigger) {
-    setFilter(categoryTrigger.dataset.filterSelect);
     document.querySelector("#collections")?.scrollIntoView({ behavior: "smooth" });
   }
 });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
-    closeDrawer();
     document.body.classList.remove("nav-open");
     menuToggle.setAttribute("aria-expanded", "false");
   }
 });
-
-window.addEventListener("popstate", syncDrawerToLocation);
 
 menuToggle.addEventListener("click", () => {
   const isOpen = document.body.classList.toggle("nav-open");
@@ -595,5 +332,7 @@ heroStage.addEventListener("pointerleave", () => {
   heroStage.style.setProperty("--pointer-y", "0px");
 });
 
-syncDrawerToLocation();
-setFilter("all");
+// Vue island: the shop section (catalog, product drawer, cart) mounts after
+// the static page markup above exists, so the #cart-slot Teleport target is
+// already in the DOM.
+createApp(ShopApp).mount("#shop-root");
