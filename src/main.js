@@ -1,410 +1,297 @@
 import "./styles.css";
+import { catalog } from "./catalog.js";
 
-const products = [
-  {
-    id: "f-10",
-    sku: "F-10",
-    name: "Facial Tissue 10-Pack",
-    category: "facial",
-    categoryLabel: "Facial Tissue",
-    mood: "Daily carry",
-    image: "/assets/facial-tissue-10-group-BRAQAcc1.png",
-    heroImage: "/assets/introA-D1LV2l4Y.png",
-    description:
-      "A compact facial tissue format built for desks, cars, hospitality counters, and everyday grab-and-go use.",
-    story:
-      "Soft 3-ply facial tissue that keeps the brand feeling bright and premium even in a smaller footprint.",
-    specs: ["10 packs", "3-ply", "110 sheets each", "174 mm x 175 mm"],
-    accent: "sky"
-  },
-  {
-    id: "fb-24",
-    sku: "FB-24",
-    name: "Facial Tissue 24-Pack",
-    category: "facial",
-    categoryLabel: "Facial Tissue",
-    mood: "High-volume restock",
-    image: "/assets/facial-tissue-24-box-CQ2iBBkn.png",
-    heroImage: "/assets/facial-tissue-24-C_T9WZKX.png",
-    description:
-      "A case-sized facial tissue option for offices, retail shelves, and larger home restocks.",
-    story:
-      "The larger case format keeps the kraft-box feel while giving the category a more confident warehouse-to-home presence.",
-    specs: ["24 packs", "3-ply", "110 sheets each", "174 mm x 175 mm"],
-    accent: "leaf"
-  },
-  {
-    id: "b-24",
-    sku: "B-24",
-    name: "Bath Tissue 24-Roll Box",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Family-size staple",
-    image: "/assets/bath-tissue-24-box-group-CognT1FQ.png",
-    heroImage: "/assets/bath-tissue-24-group-CzUg8Czx.png",
-    description:
-      "A strong, absorbent septic-safe bath tissue format designed for pantry shelves, family homes, and recurring stock-up trips.",
-    story:
-      "This is the lead bath tissue format: soft in use, graphic on shelf, and sturdy enough to feel premium instead of disposable.",
-    specs: [
-      "24 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "3.94 in x 4.72 in",
-      "Total 774.96 sq ft"
-    ],
-    accent: "sand"
-  },
-  {
-    id: "b-6",
-    sku: "B-6",
-    name: "Bath Tissue 6-Roll Pack",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Compact household pack",
-    image: "/assets/bath-tissue-6-group-D-ix8T_C.png",
-    heroImage: "/assets/bath-tissue-6-CAS3RIMa.png",
-    description:
-      "A smaller bath tissue pack for apartments, guest bathrooms, and lighter weekly restocks.",
-    story:
-      "The compact pack keeps the same softness and septic-safe story while fitting smaller spaces and smaller runs.",
-    specs: [
-      "6 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "3.94 in x 4.72 in",
-      "Total 193.71 sq ft"
-    ],
-    accent: "sun"
-  },
-  {
-    id: "bb-24",
-    sku: "BB-24",
-    name: "Bath Tissue 24-Roll Bundle",
-    category: "bath",
-    categoryLabel: "Bath Tissue",
-    mood: "Bulk transparent pack",
-    image: "/assets/bath-tissue-24-box-6EgTFqhB.png",
-    heroImage: "/assets/bath-tissue-24-inner-BCsaK-kE.png",
-    description:
-      "A bulk-forward 24-roll bath tissue presentation for wholesale, backroom stocking, and value-conscious buyers.",
-    story:
-      "This bundle pushes the brand toward distribution-ready utility without losing the softer July Sunflowers tone.",
-    specs: [
-      "3 packs, transparent packaging",
-      "24 rolls",
-      "4-ply",
-      "250 sheets per roll",
-      "Total 774.96 sq ft"
-    ],
-    accent: "sky"
-  }
-];
+// Representative thumbnail for each category tile = first item in the group.
+const groups = catalog.groups;
+const allItems = groups.flatMap((g) =>
+  g.items.map((it) => ({ ...it, groupSlug: g.slug, groupName: g.name }))
+);
+const itemById = new Map(allItems.map((it) => [String(it.no), it]));
 
+// ---- Inline SVG icon set (no external assets) ----
+const icons = {
+  search:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+  cart:
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1.6"></circle><circle cx="18" cy="21" r="1.6"></circle><path d="M1 1h3l2.6 13.4a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L23 6H6"></path></svg>',
+  account:
+    '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path></svg>',
+  chevron:
+    '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>',
+  truck:
+    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="14" height="12" rx="1"></rect><path d="M15 8h4l3 3v5h-7"></path><circle cx="6" cy="18" r="1.8"></circle><circle cx="18" cy="18" r="1.8"></circle></svg>',
+  leaf:
+    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c0-8 6-14 16-14 0 10-6 16-14 16-1 0-2-.2-2-.2z"></path><path d="M8 16c3-3 6-4 9-5"></path></svg>',
+  shield:
+    '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>',
+  facebook:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.6.75-1.6 1.5V12h2.7l-.43 2.9h-2.3v7A10 10 0 0 0 22 12z"></path></svg>',
+  instagram:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle></svg>',
+  youtube:
+    '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M23 12s0-3.3-.42-4.9a2.56 2.56 0 0 0-1.8-1.8C19.2 4.9 12 4.9 12 4.9s-7.2 0-8.78.42a2.56 2.56 0 0 0-1.8 1.8C1 8.7 1 12 1 12s0 3.3.42 4.9a2.56 2.56 0 0 0 1.8 1.8c1.58.42 8.78.42 8.78.42s7.2 0 8.78-.42a2.56 2.56 0 0 0 1.8-1.8C23 15.3 23 12 23 12zM9.75 15.5v-7l6 3.5z"></path></svg>'
+};
+
+const serviceIcons = ["truck", "leaf", "shield"];
 const proofPoints = [
   {
-    title: "Premium daily essentials",
-    copy:
-      "A warmer retail identity for the products people touch every day.",
-    stat: "Soft touch"
+    title: "Fast wholesale shipping",
+    copy: "Case-packed foodservice and paper goods ready for restaurants, offices, and retail."
   },
   {
-    title: "Responsibly positioned",
-    copy:
-      "Built around FSC-minded sourcing, cleaner packaging language, and practical household use.",
-    stat: "FSC focus"
+    title: "Responsibly sourced",
+    copy: "FSC-minded paper, compostable options, and cleaner packaging across the line."
   },
   {
-    title: "Septic-safe bath tissue",
-    copy:
-      "Comfort, strength, and quick-dissolving performance without the hard-sell branding.",
-    stat: "Home ready"
+    title: "232 SKUs, one supplier",
+    copy: "Tissue, containers, cups, cutlery, bags, and more — stock up in a single order."
   }
 ];
 
-const storyHighlights = [
-  "Inspired by the warmth, brightness, and resilience of midsummer sunflowers.",
-  "Designed to feel softer and more elevated than generic tissue aisle packaging.",
-  "Balanced for home use, light commercial placement, and bulk-friendly distribution."
-];
+function priceLabel(price) {
+  return price ? `$${price}` : "Call for price";
+}
+
+function catalogCard(it) {
+  const searchStr = `${it.sku} ${it.name} ${it.pack} ${it.groupName}`.toLowerCase();
+  return `
+    <article class="product-card" data-product-card data-group="${it.groupSlug}" data-search="${searchStr.replace(/"/g, "")}">
+      <button class="product-card__thumb" type="button" data-open-product="${it.no}" aria-label="View ${it.name}">
+        <img src="${it.image}" alt="${it.name}" loading="lazy" />
+      </button>
+      <div class="product-card__info">
+        <span class="product-card__sku">Item #${it.sku}</span>
+        <a class="product-card__name" href="#" data-open-product="${it.no}">${it.name}</a>
+        <div class="product-card__pack">${it.pack || "&nbsp;"}</div>
+        <div class="price">
+          <span class="price__main ${it.price ? "" : "price__main--call"}">${priceLabel(it.price)}</span>
+          ${it.price ? '<span class="price__unit">/ Case</span>' : ""}
+        </div>
+        <div class="product-card__actions">
+          <button class="button button--primary button--block" type="button" data-add-cart="${it.no}">
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </article>`;
+}
+
+function groupSection(g) {
+  return `
+    <section class="cat-group" id="cat-${g.slug}" data-group-section="${g.slug}">
+      <div class="row-head">
+        <h2>${g.name} <span class="row-head__count">${g.count}</span></h2>
+        <a class="row-head__link" href="#catalog-top">↑ Back to top</a>
+      </div>
+      <div class="product-grid">
+        ${g.items.map((it) => catalogCard({ ...it, groupSlug: g.slug, groupName: g.name })).join("")}
+      </div>
+    </section>`;
+}
 
 const app = document.querySelector("#app");
 
 app.innerHTML = `
   <div class="site-shell">
-    <header class="site-header">
-      <a class="brand" href="/" aria-label="July Sunflowers home">
-        <img class="brand__logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo" />
-        <div class="brand__text">
-          <span class="brand__eyebrow">Sunny softness</span>
-          <strong>July Sunflowers</strong>
+    <header class="site-header" id="top">
+      <div class="utility-bar">
+        <div class="utility-bar__inner">
+          <nav class="utility-links" aria-label="Account">
+            <a href="#account">Sign In</a>
+            <a href="#account">Create an Account</a>
+            <a href="#account">Rewards</a>
+          </nav>
+          <nav class="utility-links utility-links--right" aria-label="Orders">
+            <a href="#contact">Track Your Order</a>
+            <a href="#contact">Help</a>
+          </nav>
         </div>
-      </a>
-
-      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-        Menu
-      </button>
-
-      <div class="site-header__right">
-        <nav id="site-nav" class="site-nav" aria-label="Primary">
-          <a href="#top">Home</a>
-          <a href="#collections">Collections</a>
-          <a href="#story">Story</a>
-          <a href="#contact">Contact</a>
-        </nav>
-
-        <a class="header-chip" href="mailto:info@jsf2024.com">info@jsf2024.com</a>
       </div>
+
+      <div class="main-header">
+        <div class="main-header__inner">
+          <a class="brand" href="#top" aria-label="July Sunflowers home">
+            <img class="brand__logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo" />
+            <strong class="brand__name">July Sunflowers</strong>
+          </a>
+
+          <form class="search" role="search" data-search-form>
+            <input
+              class="search__input"
+              type="search"
+              name="q"
+              placeholder="Search 232 products by name or item #…"
+              aria-label="Search products"
+              data-search-input
+            />
+            <button class="search__button" type="submit" aria-label="Search">
+              ${icons.search}<span>Search</span>
+            </button>
+          </form>
+
+          <div class="header-actions">
+            <a class="header-action" href="#account">
+              <span class="header-action__icon">${icons.account}</span>
+              <span class="header-action__text">
+                <small>Hello, Guest</small>
+                <b>Account</b>
+              </span>
+            </a>
+            <button class="header-action header-action--cart" type="button" data-cart-open>
+              <span class="header-action__icon">
+                ${icons.cart}
+                <span class="cart-badge" data-cart-count>0</span>
+              </span>
+              <span class="header-action__text">
+                <small>Your Cart</small>
+                <b>$0.00</b>
+              </span>
+            </button>
+          </div>
+
+          <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="category-nav">
+            Menu
+          </button>
+        </div>
+      </div>
+
+      <nav class="category-nav" id="category-nav" aria-label="Product categories">
+        <div class="category-nav__inner">
+          <button class="category-nav__all" type="button" data-cat-select="all">
+            ${icons.chevron}<span>All Products</span>
+          </button>
+          ${groups
+            .slice(0, 6)
+            .map((g) => `<a href="#cat-${g.slug}" data-cat-select="${g.slug}">${g.name}</a>`)
+            .join("")}
+          <a href="#story">Our Story</a>
+          <a href="#contact">Contact</a>
+          <a class="category-nav__deal" href="#promo">Wholesale</a>
+        </div>
+      </nav>
     </header>
 
     <main>
-      <section class="hero section" id="top">
-        <div class="hero__copy" data-reveal>
-          <p class="eyebrow">Brand refresh concept</p>
-          <h1 class="hero__title">
-            Paper essentials that feel
-            <span>brighter than the aisle</span>
-          </h1>
-          <p class="hero__lede">
-            July Sunflowers already had a clear product story. This redesign turns it into a warmer,
-            more premium experience with stronger packaging presence, cleaner hierarchy, and a more
-            intentional sense of atmosphere.
-          </p>
-
-          <div class="hero__actions">
-            <a class="button button--primary" href="#collections">Explore collections</a>
-            <button class="button button--secondary" type="button" data-open-product="fb-24">
-              Open featured case
-            </button>
+      <section class="promo" id="promo">
+        <div class="promo__banner" data-reveal>
+          <div class="promo__copy">
+            <span class="promo__eyebrow">Wholesale Foodservice & Paper Goods</span>
+            <h1 class="promo__title">232 products. One supplier. Warehouse pricing.</h1>
+            <p class="promo__lede">
+              Tissue, food containers, cups, cutlery, bags, foil, and more — case-packed and ready for
+              restaurants, offices, and retail. Browse the full July Sunflowers line below.
+            </p>
+            <div class="promo__actions">
+              <a class="button button--primary" href="#catalog-top">Shop the Catalog</a>
+              <a class="button button--ghost" href="#category-tiles">Shop by Category</a>
+            </div>
           </div>
-
-          <div class="hero__facts">
-            <div class="metric-card">
-              <span class="metric-card__label">Facial tissue</span>
-              <strong>3-ply softness</strong>
-            </div>
-            <div class="metric-card">
-              <span class="metric-card__label">Bath tissue</span>
-              <strong>4-ply comfort</strong>
-            </div>
-            <div class="metric-card metric-card--icon">
-              <img src="/assets/fsc-itqMhG3J.png" alt="FSC icon" />
-              <strong>Responsible positioning</strong>
-            </div>
+          <div class="promo__visual">
+            <img src="/assets/introA-D1LV2l4Y.png" alt="July Sunflowers products" />
           </div>
         </div>
-
-        <div class="hero__stage" data-reveal>
-          <div class="hero-glow hero-glow--sun"></div>
-          <div class="hero-glow hero-glow--leaf"></div>
-          <img class="hero-ring hero-ring--one" src="/assets/Ring_green-CB9I9mGj.png" alt="" />
-          <img class="hero-ring hero-ring--two" src="/assets/Ring_blue-Dgr3Qvs1.png" alt="" />
-
-          <div class="hero-card hero-card--primary">
-            <div class="hero-card__content">
-              <span class="hero-card__tag">Facial Tissue</span>
-              <h2>Soft geometry, brighter packaging, cleaner shelf presence.</h2>
-            </div>
-            <img src="/assets/introA-D1LV2l4Y.png" alt="Facial tissue packs" />
-          </div>
-
-          <div class="hero-card hero-card--secondary">
-            <div class="hero-card__content">
-              <span class="hero-card__tag">Bath Tissue</span>
-              <p>Comfort-led packs with a warmer retail tone.</p>
-            </div>
-            <img src="/assets/bath-tissue-24-group-CzUg8Czx.png" alt="Bath tissue box and rolls" />
-          </div>
+        <div class="promo__dots" role="tablist" aria-label="Banner slides">
+          <span class="promo__dot is-active"></span>
+          <span class="promo__dot"></span>
+          <span class="promo__dot"></span>
         </div>
       </section>
 
-      <div class="wave-band" aria-hidden="true">
-        <img src="/assets/Blue_Sharp-BfeH3kMk.png" alt="" />
-      </div>
-
-      <section class="proof section">
-        <div class="section-head" data-reveal>
-          <div>
-            <p class="eyebrow">What changed</p>
-            <h2>Less generic catalog page, more real brand world.</h2>
-          </div>
-          <p class="section-head__copy">
-            The previous version functioned as a mirror. This version treats the product line like a
-            brand people could actually remember.
-          </p>
+      <section class="cat-tiles section" id="category-tiles">
+        <div class="row-head">
+          <h2>Shop by Category</h2>
+          <a class="row-head__link" href="#catalog-top">View all products →</a>
         </div>
+        <div class="cat-tiles__grid">
+          ${groups
+            .map(
+              (g) => `
+                <button class="cat-tile" type="button" data-cat-select="${g.slug}">
+                  <span class="cat-tile__media">
+                    <img src="${g.items[0].image}" alt="${g.name}" loading="lazy" />
+                  </span>
+                  <span class="cat-tile__label">${g.name}</span>
+                  <span class="cat-tile__count">${g.count} items</span>
+                </button>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
 
-        <div class="proof-grid">
+      <section class="service-strip section">
+        <ul class="service-strip__list">
           ${proofPoints
             .map(
-              (item) => `
-                <article class="proof-card" data-reveal>
-                  <span class="proof-card__stat">${item.stat}</span>
-                  <h3>${item.title}</h3>
-                  <p>${item.copy}</p>
-                </article>
+              (item, index) => `
+                <li class="service-item">
+                  <span class="service-item__icon">${icons[serviceIcons[index]] || icons.shield}</span>
+                  <div>
+                    <strong>${item.title}</strong>
+                    <p>${item.copy}</p>
+                  </div>
+                </li>
               `
             )
             .join("")}
-        </div>
+        </ul>
       </section>
 
-      <section class="categories section">
-        <article class="category-card category-card--facial" data-reveal>
-          <div class="category-card__copy">
-            <p class="eyebrow">Collection 01</p>
-            <h2>Facial tissue that feels light, clean, and giftable.</h2>
-            <p>
-              A softer brand expression for bedrooms, cars, cafes, front desks, and compact shelf
-              moments.
-            </p>
-            <button class="inline-button" type="button" data-filter-select="facial">
-              Filter facial tissue
-            </button>
+      <section class="catalog section" id="catalog-top">
+        <div class="catalog__bar">
+          <div class="catalog__bar-top">
+            <h2>Product Catalog</h2>
+            <p class="catalog__result" data-result-count>Showing all ${catalog.total} products</p>
           </div>
-          <div class="category-card__visual">
-            <img src="/assets/introA-D1LV2l4Y.png" alt="Facial tissue display" />
-          </div>
-        </article>
-
-        <article class="category-card category-card--bath" data-reveal>
-          <div class="category-card__copy">
-            <p class="eyebrow">Collection 02</p>
-            <h2>Bath tissue with a stronger, warmer household presence.</h2>
-            <p>
-              Built for stock-up behavior, pantry shelves, and septic-safe everyday comfort without
-              the usual warehouse aesthetic.
-            </p>
-            <button class="inline-button" type="button" data-filter-select="bath">
-              Filter bath tissue
-            </button>
-          </div>
-          <div class="category-card__visual">
-            <img src="/assets/bath-tissue-24-box-group-CognT1FQ.png" alt="Bath tissue packaging" />
-          </div>
-        </article>
-      </section>
-
-      <section class="products section" id="collections">
-        <div class="section-head" data-reveal>
-          <div>
-            <p class="eyebrow">Collection explorer</p>
-            <h2>Choose the format that fits the room, routine, or run size.</h2>
-          </div>
-
-          <div class="filters" role="tablist" aria-label="Product category filters">
-            <button class="filter-pill is-active" type="button" data-filter="all" aria-pressed="true">
-              All
-            </button>
-            <button class="filter-pill" type="button" data-filter="facial" aria-pressed="false">
-              Facial Tissue
-            </button>
-            <button class="filter-pill" type="button" data-filter="bath" aria-pressed="false">
-              Bath Tissue
-            </button>
-          </div>
-        </div>
-
-        <div class="product-grid">
-          ${products
-            .map(
-              (product, index) => `
-                <article
-                  class="product-card product-card--${product.accent} ${index === 0 ? "product-card--wide" : ""}"
-                  data-category="${product.category}"
-                  data-product-card
-                  data-reveal
-                >
-                  <div class="product-card__meta">
-                    <span class="pill">${product.categoryLabel}</span>
-                    <strong>${product.sku}</strong>
-                  </div>
-                  <div class="product-card__body">
-                    <div class="product-card__copy">
-                      <span class="product-card__mood">${product.mood}</span>
-                      <h3>${product.name}</h3>
-                      <p>${product.description}</p>
-                      <ul class="spec-list">
-                        ${product.specs
-                          .slice(0, 3)
-                          .map((spec) => `<li>${spec}</li>`)
-                          .join("")}
-                      </ul>
-                      <button class="inline-button" type="button" data-open-product="${product.id}">
-                        View details
-                      </button>
-                    </div>
-                    <div class="product-card__visual">
-                      <img src="${product.image}" alt="${product.name}" />
-                    </div>
-                  </div>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-      </section>
-
-      <section class="story section" id="story">
-        <div class="story__copy" data-reveal>
-          <p class="eyebrow">Story and tone</p>
-          <h2>Warm, resilient, and a little more joyful than standard tissue branding.</h2>
-          <p>
-            July Sunflowers started with the right emotional idea: warmth, brightness, comfort, and
-            clean daily use. The redesign pushes that idea further with richer spacing, a warmer paper
-            palette, stronger product framing, and a more editorial presentation of the people and
-            atmosphere around the brand.
-          </p>
-
-          <div class="story-list">
-            ${storyHighlights
+          <div class="filters" role="tablist" aria-label="Category filters">
+            <button class="filter-pill is-active" type="button" data-cat-select="all">All (${catalog.total})</button>
+            ${groups
               .map(
-                (line) => `
-                  <div class="story-list__item">
-                    <span></span>
-                    <p>${line}</p>
-                  </div>
-                `
+                (g) =>
+                  `<button class="filter-pill" type="button" data-cat-select="${g.slug}">${g.name} (${g.count})</button>`
               )
               .join("")}
           </div>
         </div>
 
-        <div class="story__visual" data-reveal>
-          <div class="collage collage--large">
-            <img src="/assets/founder-2-DetXMqVk.jpg" alt="Brand story moment" />
-          </div>
-          <div class="collage collage--small collage--product">
-            <img src="/assets/bath-tissue-24-box-6EgTFqhB.png" alt="Bath tissue box" />
-          </div>
-          <div class="collage collage--small">
-            <img src="/assets/founder-3-DTGoNZbi.jpg" alt="Founder portrait" />
-          </div>
-          <div class="collage collage--wide">
-            <img src="/assets/founder-1-tzXmZdUA.jpg" alt="Performance portrait" />
+        <div class="catalog__body" data-catalog-body>
+          ${groups.map((g) => groupSection(g)).join("")}
+          <p class="catalog__empty" data-empty hidden>No products match your search.</p>
+        </div>
+      </section>
+
+      <section class="about section" id="story">
+        <div class="about__inner">
+          <div class="about__copy">
+            <span class="about__eyebrow">About July Sunflowers</span>
+            <p>
+              July Sunflowers supplies premium tissue and a full line of foodservice and paper goods —
+              from facial and bath tissue to food containers, cups, cutlery, bags, and foil. Balanced
+              for restaurants, offices, retail, and bulk-friendly wholesale distribution.
+            </p>
+            <ul class="about__points">
+              <li>232 case-packed SKUs across 13 product categories.</li>
+              <li>FSC-minded paper, compostable options, and cleaner packaging.</li>
+              <li>Warehouse-to-business pricing with a single point of contact.</li>
+            </ul>
           </div>
         </div>
       </section>
 
       <section class="contact section" id="contact">
-        <div class="contact__intro" data-reveal>
-          <p class="eyebrow">Contact</p>
-          <h2>Ready for retail, wholesale, and direct conversations.</h2>
-          <p>
-            The product line already exists. This redesign simply gives it a sharper front door.
-          </p>
+        <div class="row-head">
+          <h2>Contact Us</h2>
         </div>
-
         <div class="contact-grid">
-          <a class="contact-card" href="tel:+19098283565" data-reveal>
+          <a class="contact-card" href="tel:+19098283565">
             <span class="contact-card__label">Phone</span>
             <strong>+1 (909) 828-3565</strong>
           </a>
-          <a class="contact-card" href="mailto:info@jsf2024.com" data-reveal>
+          <a class="contact-card" href="mailto:info@jsf2024.com">
             <span class="contact-card__label">Email</span>
             <strong>info@jsf2024.com</strong>
           </a>
-          <div class="contact-card" data-reveal>
+          <div class="contact-card">
             <span class="contact-card__label">Address</span>
             <strong>5595 Daniels St STE B<br>Chino, CA 91710<br>United States</strong>
           </div>
@@ -413,25 +300,89 @@ app.innerHTML = `
     </main>
 
     <footer class="site-footer">
-      <p>© 2026 July Sunflowers</p>
-      <p>Sunny softness. Pure joy.</p>
+      <div class="site-footer__top">
+        <div class="footer-col footer-col--brand">
+          <img class="footer-logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo" />
+          <p>Premium tissue and wholesale foodservice & paper goods with a warmer, cleaner brand experience.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook">${icons.facebook}</a>
+            <a href="#" aria-label="Instagram">${icons.instagram}</a>
+            <a href="#" aria-label="YouTube">${icons.youtube}</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="#contact">Track Your Order</a></li>
+            <li><a href="#contact">Shipping Info</a></li>
+            <li><a href="#contact">Returns</a></li>
+            <li><a href="#contact">Help Center</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <ul>
+            ${groups
+              .slice(0, 5)
+              .map((g) => `<li><a href="#cat-${g.slug}" data-cat-select="${g.slug}">${g.name}</a></li>`)
+              .join("")}
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>About Us</h4>
+          <ul>
+            <li><a href="#story">Our Story</a></li>
+            <li><a href="#promo">Wholesale</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:+19098283565">+1 (909) 828-3565</a></li>
+            <li><a href="mailto:info@jsf2024.com">info@jsf2024.com</a></li>
+            <li>5595 Daniels St STE B<br>Chino, CA 91710</li>
+          </ul>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        <p>© 2026 July Sunflowers. All rights reserved.</p>
+        <nav class="footer-legal" aria-label="Legal">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Use</a>
+          <a href="#">Accessibility</a>
+        </nav>
+      </div>
     </footer>
 
     <div class="product-drawer" id="product-drawer" hidden aria-hidden="true">
       <button class="product-drawer__backdrop" type="button" aria-label="Close product details"></button>
       <aside class="product-drawer__panel" aria-labelledby="drawer-title">
-        <button class="product-drawer__close" type="button" aria-label="Close product details">Close</button>
+        <button class="product-drawer__close" type="button" aria-label="Close product details">&times;</button>
         <div class="product-drawer__media">
           <div class="product-drawer__media-card">
             <img id="drawer-image" src="" alt="" />
           </div>
         </div>
         <div class="product-drawer__copy">
-          <p class="eyebrow" id="drawer-category"></p>
+          <p class="product-drawer__eyebrow" id="drawer-category"></p>
           <h2 id="drawer-title"></h2>
-          <p class="product-drawer__story" id="drawer-story"></p>
-          <p class="product-drawer__description" id="drawer-description"></p>
-          <div class="product-drawer__specs" id="drawer-specs"></div>
+          <div class="product-drawer__price">
+            <span class="price__main" id="drawer-price"></span>
+            <span class="product-drawer__pack" id="drawer-pack"></span>
+          </div>
+          <div class="product-drawer__meta" id="drawer-meta"></div>
+          <div class="product-drawer__buy">
+            <div class="qty">
+              <button type="button" class="qty__btn" data-qty="-1" aria-label="Decrease quantity">−</button>
+              <input class="qty__input" id="drawer-qty" type="number" value="1" min="1" aria-label="Quantity" />
+              <button type="button" class="qty__btn" data-qty="1" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="button button--primary button--lg" type="button" id="drawer-add">
+              Add to Cart
+            </button>
+          </div>
+          <p class="product-drawer__note">Prices and pack sizes are wholesale, per case. Contact us for volume quotes and availability.</p>
         </div>
       </aside>
     </div>
@@ -442,58 +393,106 @@ const drawer = document.querySelector("#product-drawer");
 const drawerImage = document.querySelector("#drawer-image");
 const drawerCategory = document.querySelector("#drawer-category");
 const drawerTitle = document.querySelector("#drawer-title");
-const drawerStory = document.querySelector("#drawer-story");
-const drawerDescription = document.querySelector("#drawer-description");
-const drawerSpecs = document.querySelector("#drawer-specs");
-const filterButtons = [...document.querySelectorAll("[data-filter]")];
+const drawerPrice = document.querySelector("#drawer-price");
+const drawerPack = document.querySelector("#drawer-pack");
+const drawerMeta = document.querySelector("#drawer-meta");
+const drawerQty = document.querySelector("#drawer-qty");
+const drawerAdd = document.querySelector("#drawer-add");
+const catPills = [...document.querySelectorAll("[data-cat-select]")];
+const groupSections = [...document.querySelectorAll("[data-group-section]")];
 const productCards = [...document.querySelectorAll("[data-product-card]")];
+const emptyMsg = document.querySelector("[data-empty]");
+const resultCount = document.querySelector("[data-result-count]");
 const menuToggle = document.querySelector(".menu-toggle");
-const siteNav = document.querySelector(".site-nav");
-const heroStage = document.querySelector(".hero__stage");
+const categoryNav = document.querySelector(".category-nav");
+const searchForm = document.querySelector("[data-search-form]");
+const searchInput = document.querySelector("[data-search-input]");
+const cartCountEl = document.querySelector("[data-cart-count]");
 
-function getProductById(id) {
-  return products.find((product) => product.id === id);
+let activeDrawerId = null;
+let cartCount = 0;
+let activeCategory = "all";
+
+function addToCart(quantity = 1) {
+  cartCount += quantity;
+  cartCountEl.textContent = String(cartCount);
+  cartCountEl.classList.remove("is-bump");
+  void cartCountEl.offsetWidth;
+  cartCountEl.classList.add("is-bump");
 }
 
-function getRouteProductId() {
-  const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
-  return match ? decodeURIComponent(match[1]).toLowerCase() : null;
-}
-
-function setFilter(nextFilter) {
-  filterButtons.forEach((button) => {
-    const active = button.dataset.filter === nextFilter;
-    button.classList.toggle("is-active", active);
-    button.setAttribute("aria-pressed", String(active));
-  });
+function applyView() {
+  const term = searchInput.value.trim().toLowerCase();
+  let visible = 0;
 
   productCards.forEach((card) => {
-    const shouldShow =
-      nextFilter === "all" || card.dataset.category === nextFilter;
-    card.classList.toggle("is-hidden", !shouldShow);
+    const matchCat = activeCategory === "all" || card.dataset.group === activeCategory;
+    const matchTerm = !term || card.dataset.search.includes(term);
+    const show = matchCat && matchTerm;
+    card.classList.toggle("is-hidden", !show);
+    if (show) visible += 1;
   });
+
+  // hide empty group sections
+  groupSections.forEach((sec) => {
+    const anyVisible = sec.querySelector('[data-product-card]:not(.is-hidden)');
+    sec.classList.toggle("is-hidden", !anyVisible);
+  });
+
+  emptyMsg.hidden = visible !== 0;
+
+  // update pills active state
+  catPills.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.catSelect === activeCategory && !term);
+  });
+
+  if (term) {
+    resultCount.textContent = `${visible} result${visible === 1 ? "" : "s"} for “${searchInput.value.trim()}”`;
+  } else if (activeCategory === "all") {
+    resultCount.textContent = `Showing all ${catalog.total} products`;
+  } else {
+    const g = groups.find((x) => x.slug === activeCategory);
+    resultCount.textContent = `${g ? g.count : visible} products in ${g ? g.name : ""}`;
+  }
 }
 
-function openDrawer(productId, pushState = true) {
-  const product = getProductById(productId);
-  if (!product) return;
+function selectCategory(slug) {
+  activeCategory = slug;
+  searchInput.value = "";
+  applyView();
+  document.body.classList.remove("nav-open");
+  menuToggle.setAttribute("aria-expanded", "false");
+  if (slug === "all") {
+    document.querySelector("#catalog-top")?.scrollIntoView({ behavior: "smooth" });
+  } else {
+    document.querySelector(`#cat-${slug}`)?.scrollIntoView({ behavior: "smooth" });
+  }
+}
 
-  drawerImage.src = product.heroImage;
-  drawerImage.alt = product.name;
-  drawerCategory.textContent = `${product.categoryLabel} / ${product.sku}`;
-  drawerTitle.textContent = product.name;
-  drawerStory.textContent = product.story;
-  drawerDescription.textContent = product.description;
-  drawerSpecs.innerHTML = product.specs
-    .map((spec) => `<span class="spec-chip">${spec}</span>`)
-    .join("");
+function openDrawer(id, pushState = true) {
+  const it = itemById.get(String(id));
+  if (!it) return;
+  activeDrawerId = it.no;
+  drawerImage.src = it.image;
+  drawerImage.alt = it.name;
+  drawerCategory.textContent = `${it.groupName} · Item #${it.sku}`;
+  drawerTitle.textContent = it.name;
+  drawerPrice.textContent = priceLabel(it.price);
+  drawerPrice.classList.toggle("price__main--call", !it.price);
+  drawerPack.textContent = it.price ? "/ Case" : "";
+  drawerMeta.innerHTML = `
+    <div class="drawer-meta-row"><span>Item #</span><strong>${it.sku}</strong></div>
+    <div class="drawer-meta-row"><span>Case Pack</span><strong>${it.pack || "—"}</strong></div>
+    <div class="drawer-meta-row"><span>Category</span><strong>${it.groupName}</strong></div>
+    <div class="drawer-meta-row"><span>Case Price</span><strong>${priceLabel(it.price)}</strong></div>`;
+  drawerQty.value = "1";
 
   drawer.hidden = false;
   drawer.setAttribute("aria-hidden", "false");
   document.body.classList.add("drawer-open");
 
-  if (pushState && window.location.pathname !== `/product/${product.id}`) {
-    window.history.pushState({ product: product.id }, "", `/product/${product.id}`);
+  if (pushState && window.location.pathname !== `/product/${it.no}`) {
+    window.history.pushState({ product: it.no }, "", `/product/${it.no}`);
   }
 }
 
@@ -501,25 +500,34 @@ function closeDrawer(pushState = true) {
   drawer.hidden = true;
   drawer.setAttribute("aria-hidden", "true");
   document.body.classList.remove("drawer-open");
-
+  activeDrawerId = null;
   if (pushState && window.location.pathname.startsWith("/product/")) {
     window.history.pushState({}, "", "/");
   }
 }
 
+function getRouteProductId() {
+  const match = window.location.pathname.match(/^\/product\/([^/]+)\/?$/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 function syncDrawerToLocation() {
-  const productId = getRouteProductId();
-  if (productId) {
-    openDrawer(productId, false);
-  } else {
-    closeDrawer(false);
-  }
+  const id = getRouteProductId();
+  if (id && itemById.has(String(id))) openDrawer(id, false);
+  else closeDrawer(false);
 }
 
 document.addEventListener("click", (event) => {
   const openTrigger = event.target.closest("[data-open-product]");
   if (openTrigger) {
+    event.preventDefault();
     openDrawer(openTrigger.dataset.openProduct);
+    return;
+  }
+
+  const addTrigger = event.target.closest("[data-add-cart]");
+  if (addTrigger) {
+    addToCart(1);
     return;
   }
 
@@ -531,17 +539,36 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const filterTrigger = event.target.closest("[data-filter]");
-  if (filterTrigger) {
-    setFilter(filterTrigger.dataset.filter);
-    return;
+  const catTrigger = event.target.closest("[data-cat-select]");
+  if (catTrigger) {
+    event.preventDefault();
+    selectCategory(catTrigger.dataset.catSelect);
   }
+});
 
-  const categoryTrigger = event.target.closest("[data-filter-select]");
-  if (categoryTrigger) {
-    setFilter(categoryTrigger.dataset.filterSelect);
-    document.querySelector("#collections")?.scrollIntoView({ behavior: "smooth" });
+drawer.addEventListener("click", (event) => {
+  const stepper = event.target.closest("[data-qty]");
+  if (stepper) {
+    const delta = Number(stepper.dataset.qty);
+    drawerQty.value = String(Math.max(1, (Number(drawerQty.value) || 1) + delta));
   }
+});
+
+drawerAdd.addEventListener("click", () => {
+  if (!activeDrawerId) return;
+  addToCart(Math.max(1, Number(drawerQty.value) || 1));
+});
+
+searchForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  applyView();
+  document.querySelector("#catalog-top")?.scrollIntoView({ behavior: "smooth" });
+});
+
+let searchTimer;
+searchInput.addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(applyView, 140);
 });
 
 document.addEventListener("keydown", (event) => {
@@ -559,7 +586,7 @@ menuToggle.addEventListener("click", () => {
   menuToggle.setAttribute("aria-expanded", String(isOpen));
 });
 
-siteNav.querySelectorAll("a").forEach((link) => {
+categoryNav.querySelectorAll("a").forEach((link) => {
   link.addEventListener("click", () => {
     document.body.classList.remove("nav-open");
     menuToggle.setAttribute("aria-expanded", "false");
@@ -575,25 +602,9 @@ const revealObserver = new IntersectionObserver(
       }
     });
   },
-  { threshold: 0.15 }
+  { threshold: 0.12 }
 );
-
-document.querySelectorAll("[data-reveal]").forEach((node) => {
-  revealObserver.observe(node);
-});
-
-heroStage.addEventListener("pointermove", (event) => {
-  const rect = heroStage.getBoundingClientRect();
-  const x = (event.clientX - rect.left) / rect.width - 0.5;
-  const y = (event.clientY - rect.top) / rect.height - 0.5;
-  heroStage.style.setProperty("--pointer-x", `${x * 18}px`);
-  heroStage.style.setProperty("--pointer-y", `${y * 18}px`);
-});
-
-heroStage.addEventListener("pointerleave", () => {
-  heroStage.style.setProperty("--pointer-x", "0px");
-  heroStage.style.setProperty("--pointer-y", "0px");
-});
+document.querySelectorAll("[data-reveal]").forEach((node) => revealObserver.observe(node));
 
 syncDrawerToLocation();
-setFilter("all");
+applyView();

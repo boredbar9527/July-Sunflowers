@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>July Sunflowers | Catalog Admin</title>
+<meta name="theme-color" content="#2f7d32">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<style>
+  /* Matches the storefront theme (WebstaurantStore-style): green #2f7d32,
+     orange CTA, clean white surfaces, system font. */
+  :root {
+    --green: #2f7d32;
+    --green-d: #256127;
+    --nav: #234d27;
+    --orange: #ef7c1b;
+    --orange-d: #d76c11;
+    --ink: #1f2a24;
+    --text: #3b423d;
+    --muted: #6d7570;
+    --line: #e2e6e2;
+    --line-2: #eef1ee;
+    --bg: #f1f3f1;
+    --surface: #ffffff;
+    --accent-tint: #eef6ee;
+    --price: #17532a;
+    --danger: #c23b2b;
+    --shadow: 0 1px 2px rgba(20, 40, 25, .06), 0 8px 24px rgba(20, 40, 25, .06);
+    --radius: 10px;
+    --radius-sm: 7px;
+    --surface-strong: #fff;
+    --green-deep: #17532a;
+    --ink-soft: #6d7570;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font: 15px/1.5 var(--font); color: var(--text);
+    min-height: 100vh; background: var(--bg);
+  }
+  header {
+    position: sticky; top: 0; z-index: 30;
+    padding: 12px 24px; display: flex; align-items: center; gap: 14px;
+    background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
+  }
+  header .logo { width: 44px; height: 44px; object-fit: contain; }
+  header .brand-text { display: flex; flex-direction: column; gap: 2px; }
+  header .eyebrow {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  header h1 { font-weight: 800; font-size: 1.3rem; margin: 0; line-height: 1; color: var(--green-d); letter-spacing: -.01em; }
+  header .hint { margin-left: auto; font-size: 13px; color: var(--muted); text-align: right; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 20px 80px; }
+  section {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 22px 24px; margin-bottom: 18px; box-shadow: var(--shadow);
+  }
+  h2 { font-weight: 800; font-size: 1.25rem; margin: 0 0 14px; color: var(--ink); letter-spacing: -.01em; }
+  label { font-size: 0.78rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 4px; }
+  input, select, textarea, button { font: inherit; }
+  input, select, textarea {
+    border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 9px 12px;
+    background: #fff; width: 100%; color: var(--ink); font-size: 0.92rem;
+  }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px var(--accent-tint); }
+  textarea { resize: vertical; min-height: 60px; }
+  button {
+    border: 0; border-radius: var(--radius-sm); padding: 10px 18px; cursor: pointer; font-weight: 700;
+    transition: background-color .15s ease, transform .12s ease, border-color .15s ease;
+  }
+  button.primary { color: #fff; background: var(--green); }
+  button.primary:hover:not(:disabled) { background: var(--green-d); }
+  button.ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+  button.ghost:hover:not(:disabled) { border-color: var(--green); color: var(--green-d); }
+  button.danger { background: var(--danger); color: #fff; }
+  button:hover:not(:disabled), button:focus-visible:not(:disabled) { transform: translateY(-1px); }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  #btn-publish { background: var(--orange); }
+  #btn-publish:hover:not(:disabled) { background: var(--orange-d); }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+  .row > div { flex: 1; min-width: 130px; }
+  .row > div.narrow { flex: 0 0 130px; min-width: 130px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line-2); vertical-align: top; }
+  th {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--green-d);
+    position: sticky; top: 0; background: var(--accent-tint); z-index: 1; border-bottom: 1px solid var(--line);
+  }
+  tbody tr:hover { background: var(--accent-tint); }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  td.num { font-weight: 700; color: var(--price); }
+  .table-wrap { max-height: 480px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .muted { color: var(--muted); font-weight: 400; }
+  .actions { white-space: nowrap; }
+  .actions button { padding: 6px 14px; font-size: 0.82rem; margin-left: 4px; }
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--nav); color: #fff; padding: 12px 22px; border-radius: var(--radius-sm);
+    box-shadow: var(--shadow); opacity: 0; transition: opacity .25s; pointer-events: none; max-width: 90vw;
+  }
+  #toast.show { opacity: 1; }
+  #toast.error { background: var(--danger); }
+  dialog {
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; width: min(680px, 92vw);
+    background: var(--surface); box-shadow: 0 20px 50px rgba(20, 40, 25, .18); color: var(--text);
+  }
+  dialog::backdrop { background: rgba(20, 30, 24, 0.48); }
+  dialog h2 { margin-bottom: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid2 .full { grid-column: 1 / -1; }
+  .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .count-pill {
+    background: var(--accent-tint); color: var(--green-d);
+    border-radius: 999px; padding: 3px 12px; font-size: 0.8rem; font-weight: 700; vertical-align: middle;
+  }
+  .preview { font-size: 0.85rem; margin-top: 10px; }
+  input[type="file"] { border: 0; padding: 0; background: none; border-radius: 0; }
+  .p-banner-preview { max-height: 96px; border-radius: 8px; margin-top: 8px; display: block; border: 1px solid var(--line); }
+  @media (max-width: 640px) {
+    header { flex-wrap: wrap; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="/assets/logo-LCTJEtBP.png" alt="July Sunflowers logo">
+  <div class="brand-text">
+    <span class="eyebrow">Catalog Admin</span>
+    <h1>July Sunflowers</h1>
+  </div>
+  <span class="hint" id="pub-status">Checking publish status…</span>
+  <button class="primary" id="btn-publish" disabled>Publish to website</button>
+</header>
+<main>
+
+  <section id="settings">
+    <h2>Store info &amp; contact</h2>
+    <p class="muted" style="margin:-6px 0 14px">
+      Email, phone, and address shown across the website (nav, footer, contact page, invoices).
+    </p>
+    <div class="grid2">
+      <div><label>Public contact email (shown on site)</label><input id="s-contactEmail" type="email"></div>
+      <div><label>Order email (where orders are delivered)</label><input id="s-orderEmail" type="email"></div>
+      <div><label>Phone — display (e.g. +1 (909) 828-3565)</label><input id="s-phoneDisplay"></div>
+      <div><label>Phone — call link (digits only, e.g. +19098283565)</label><input id="s-phoneTel"></div>
+      <div><label>WhatsApp number (digits, country code first)</label><input id="s-whatsappNumber"></div>
+      <div class="full"><label>Address</label><input id="s-address"></div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="primary" id="settings-save">Save store info</button>
+    </div>
+  </section>
+
+  <section id="adjust">
+    <h2>Price adjustment (by percentage)</h2>
+    <div class="row">
+      <div class="narrow">
+        <label for="adj-dir">Direction</label>
+        <select id="adj-dir">
+          <option value="raise">Raise ▲</option>
+          <option value="drop">Drop ▼</option>
+        </select>
+      </div>
+      <div class="narrow">
+        <label for="adj-pct">Percent</label>
+        <input id="adj-pct" type="number" min="0.01" step="0.01" placeholder="e.g. 10">
+      </div>
+      <div>
+        <label for="adj-scope">Apply to</label>
+        <select id="adj-scope">
+          <option value="all">All products</option>
+          <option value="category">One category…</option>
+          <option value="selected">Selected products (checkboxes below)</option>
+        </select>
+      </div>
+      <div id="adj-cat-wrap" style="display:none">
+        <label for="adj-cat">Category</label>
+        <select id="adj-cat"></select>
+      </div>
+      <div class="narrow">
+        <button class="primary" id="adj-apply">Apply</button>
+      </div>
+    </div>
+    <div class="preview muted" id="adj-preview"></div>
+  </section>
+
+  <section>
+    <div class="row" style="align-items:center; margin-bottom:12px">
+      <h2 style="margin:0">Products <span class="count-pill" id="count"></span></h2>
+      <div style="flex:2; min-width:220px">
+        <input id="search" type="search" placeholder="Search name or SKU…">
+      </div>
+      <div>
+        <select id="filter-cat"><option value="">All categories</option></select>
+      </div>
+      <div class="narrow">
+        <button class="primary" id="btn-add">+ Add listing</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px"><input type="checkbox" id="check-all" style="width:auto"></th>
+            <th>SKU</th><th>Name</th><th>Category</th><th>Unit</th>
+            <th class="num">Price</th><th class="actions"></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<dialog id="product-dialog">
+  <h2 id="dialog-title">Add listing</h2>
+  <form id="product-form" method="dialog">
+    <div class="grid2">
+      <div><label>SKU *</label><input name="sku" required></div>
+      <div><label>Name *</label><input name="name" required></div>
+      <div>
+        <label>Category *</label>
+        <input name="category" list="cat-list" required placeholder="e.g. cups">
+        <datalist id="cat-list"></datalist>
+      </div>
+      <div><label>Category label</label><input name="category_label" placeholder="e.g. Cups"></div>
+      <div><label>Unit (per case)</label><input name="unit" placeholder="e.g. 150 pcs"></div>
+      <div><label>Price (USD, empty = contact for pricing)</label><input name="price" type="number" min="0" step="0.01"></div>
+      <div>
+        <label>Badge (shown on the product card)</label>
+        <input name="badge" list="badge-list" placeholder="none — or Best Seller, New…">
+        <datalist id="badge-list">
+          <option value="Best Seller"><option value="New"><option value="Popular"><option value="Sale"><option value="Limited">
+        </datalist>
+      </div>
+      <div>
+        <label>Card image — shown in the product grid</label>
+        <input name="image" placeholder="/assets/products/…">
+        <input type="file" id="file-image" accept=".jpg,.jpeg,.png,.webp" style="margin-top:6px; font-size:13px">
+      </div>
+      <div>
+        <label>Hover image — shown when the mouse is over the card</label>
+        <input name="hover_image" placeholder="/assets/products/…">
+        <input type="file" id="file-hover-img" accept=".jpg,.jpeg,.png,.webp" style="margin-top:6px; font-size:13px">
+      </div>
+      <div>
+        <label>Detail image — shown when the product is opened</label>
+        <input name="hero_image" placeholder="/assets/products/…">
+        <input type="file" id="file-hero" accept=".jpg,.jpeg,.png,.webp" style="margin-top:6px; font-size:13px">
+      </div>
+      <div class="full"><label>Description — shown on the product detail</label><textarea name="story" placeholder="Short selling description, materials, sizes, use cases…"></textarea></div>
+    </div>
+    <div class="dialog-actions">
+      <button type="button" class="ghost" id="dialog-cancel">Cancel</button>
+      <button type="submit" class="primary" id="dialog-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+let products = [];
+let editingSku = null; // null = adding
+
+const $ = (id) => document.getElementById(id);
+const rowsEl = $("rows");
+
+function toast(msg, isError) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = isError ? "show error" : "show";
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => (t.className = ""), 3500);
+}
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || res.statusText);
+  return body;
+}
+
+async function load() {
+  products = (await api("/api/products")).products;
+  renderCategories();
+  render();
+  refreshPublishStatus();
+}
+
+// --- publish ---
+let pendingCount = 0;
+async function refreshPublishStatus() {
+  const el = $("pub-status");
+  const btn = $("btn-publish");
+  try {
+    const s = await api("/api/publish-status");
+    pendingCount = s.changes.length + s.ahead;
+    if (pendingCount > 0) {
+      el.textContent = `${pendingCount} unpublished change(s)`;
+      btn.disabled = false;
+    } else {
+      el.textContent = "Website is up to date";
+      btn.disabled = true;
+    }
+  } catch (e) {
+    el.textContent = "Publish status unavailable";
+    btn.disabled = true;
+  }
+}
+
+$("btn-publish").addEventListener("click", async () => {
+  if (!confirm(
+    `Publish ${pendingCount} change(s) to the live website?\n\n` +
+    "This uploads the catalog to GitHub; the website rebuilds automatically (about 1-2 minutes)."
+  )) return;
+  const btn = $("btn-publish");
+  btn.disabled = true;
+  btn.textContent = "Publishing…";
+  try {
+    await api("/api/publish", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    });
+    toast("Published! The website will update in a minute or two.");
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    btn.textContent = "Publish to website";
+    refreshPublishStatus();
+  }
+});
+
+function categories() {
+  const map = new Map();
+  for (const p of products) if (p.category && !map.has(p.category)) map.set(p.category, p.category_label || p.category);
+  return map;
+}
+
+function renderCategories() {
+  const cats = categories();
+  const opts = [...cats].map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+  $("filter-cat").innerHTML = '<option value="">All categories</option>' + opts;
+  $("adj-cat").innerHTML = opts;
+  $("cat-list").innerHTML = [...cats.keys()].map((v) => `<option value="${v}">`).join("");
+}
+
+function visibleProducts() {
+  const q = $("search").value.trim().toLowerCase();
+  const cat = $("filter-cat").value;
+  return products.filter((p) =>
+    (!cat || p.category === cat) &&
+    (!q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))
+  );
+}
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function render() {
+  const list = visibleProducts();
+  $("count").textContent = list.length === products.length
+    ? `${products.length}`
+    : `${list.length} of ${products.length}`;
+  rowsEl.innerHTML = list.map((p) => `
+    <tr data-sku="${esc(p.sku)}">
+      <td><input type="checkbox" class="pick" style="width:auto"></td>
+      <td>${esc(p.sku)}</td>
+      <td>${esc(p.name)}</td>
+      <td>${esc(p.category_label || p.category)}</td>
+      <td>${esc(p.unit)}</td>
+      <td class="num">${p.price ? "$" + Number(p.price).toFixed(2) : '<span class="muted">contact</span>'}</td>
+      <td class="actions">
+        <button class="ghost btn-edit">Edit</button>
+        <button class="danger btn-del">Delete</button>
+      </td>
+    </tr>`).join("");
+  $("check-all").checked = false;
+  updatePreview();
+}
+
+function selectedSkus() {
+  return [...rowsEl.querySelectorAll(".pick:checked")].map((cb) => cb.closest("tr").dataset.sku);
+}
+
+// --- price adjustment ---
+function adjustParams() {
+  const pct = Number($("adj-pct").value);
+  const sign = $("adj-dir").value === "drop" ? -1 : 1;
+  const scope = $("adj-scope").value;
+  return {
+    percent: sign * pct,
+    category: scope === "category" ? $("adj-cat").value : undefined,
+    skus: scope === "selected" ? selectedSkus() : undefined
+  };
+}
+
+function matchedForPreview() {
+  const { category, skus } = adjustParams();
+  const set = skus ? new Set(skus) : null;
+  return products.filter((p) =>
+    (!category || p.category === category) && (!set || set.has(p.sku))
+  );
+}
+
+function updatePreview() {
+  const pct = Number($("adj-pct").value);
+  const el = $("adj-preview");
+  if (!pct || pct <= 0) { el.textContent = ""; return; }
+  const { percent } = adjustParams();
+  const matched = matchedForPreview();
+  const priced = matched.filter((p) => String(p.price).trim() !== "");
+  const sample = priced[0];
+  let msg = `${priced.length} priced product(s) will change` +
+    (matched.length > priced.length ? ` (${matched.length - priced.length} without a price are skipped)` : "") + ".";
+  if (sample) {
+    const next = Math.round(Number(sample.price) * (1 + percent / 100) * 100) / 100;
+    msg += ` Example: ${sample.sku} $${Number(sample.price).toFixed(2)} → $${next.toFixed(2)}.`;
+  }
+  el.textContent = msg;
+}
+
+["adj-pct", "adj-dir", "adj-scope", "adj-cat"].forEach((id) =>
+  $(id).addEventListener("input", () => {
+    $("adj-cat-wrap").style.display = $("adj-scope").value === "category" ? "" : "none";
+    updatePreview();
+  })
+);
+
+$("adj-apply").addEventListener("click", async () => {
+  const params = adjustParams();
+  if (!params.percent) return toast("Enter a percentage first.", true);
+  if (params.skus && !params.skus.length) return toast("Select at least one product below.", true);
+  const matched = matchedForPreview().filter((p) => String(p.price).trim() !== "");
+  if (!matched.length) return toast("No priced products match that scope.", true);
+  const dir = params.percent > 0 ? "RAISE" : "DROP";
+  if (!confirm(`${dir} prices by ${Math.abs(params.percent)}% for ${matched.length} product(s)?`)) return;
+  try {
+    const r = await api("/api/price-adjust", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params)
+    });
+    toast(`Updated ${r.changed} price(s).`);
+    await load();
+  } catch (e) { toast(e.message, true); }
+});
+
+// --- table interactions ---
+$("search").addEventListener("input", render);
+$("filter-cat").addEventListener("change", render);
+$("check-all").addEventListener("change", (e) => {
+  rowsEl.querySelectorAll(".pick").forEach((cb) => (cb.checked = e.target.checked));
+  updatePreview();
+});
+rowsEl.addEventListener("change", (e) => {
+  if (e.target.classList.contains("pick")) updatePreview();
+});
+
+rowsEl.addEventListener("click", async (e) => {
+  const tr = e.target.closest("tr");
+  if (!tr) return;
+  const sku = tr.dataset.sku;
+  if (e.target.classList.contains("btn-edit")) {
+    openDialog(products.find((p) => p.sku === sku));
+  } else if (e.target.classList.contains("btn-del")) {
+    const p = products.find((x) => x.sku === sku);
+    if (!confirm(`Delete "${p.name}" (SKU ${sku})? This removes it from the catalog.`)) return;
+    try {
+      await api("/api/products/" + encodeURIComponent(sku), { method: "DELETE" });
+      toast(`Deleted ${sku}.`);
+      await load();
+    } catch (err) { toast(err.message, true); }
+  }
+});
+
+// --- add / edit dialog ---
+const dialog = $("product-dialog");
+const form = $("product-form");
+
+function openDialog(product) {
+  editingSku = product ? product.sku : null;
+  $("dialog-title").textContent = product ? `Edit ${product.sku}` : "Add listing";
+  form.reset();
+  if (product) for (const [k, v] of Object.entries(product)) {
+    if (form.elements[k]) form.elements[k].value = v;
+  }
+  dialog.showModal();
+}
+
+$("btn-add").addEventListener("click", () => openDialog(null));
+$("dialog-cancel").addEventListener("click", () => dialog.close());
+
+// Auto-fill category_label from an existing category, or title-case a new one.
+form.elements.category.addEventListener("change", () => {
+  const labelInput = form.elements.category_label;
+  if (labelInput.value.trim()) return;
+  const v = form.elements.category.value.trim();
+  const existing = products.find((p) => p.category === v);
+  labelInput.value = existing
+    ? existing.category_label
+    : v.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+});
+
+// Upload a chosen file to public/assets/products/ and fill in the path field.
+async function wireUpload(fileInputId, targetField) {
+  $(fileInputId).addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const data = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(",")[1]);
+        r.onerror = () => reject(new Error("Could not read the file."));
+        r.readAsDataURL(file);
+      });
+      const res = await api("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename: file.name, data })
+      });
+      form.elements[targetField].value = res.path;
+      toast(`Uploaded ${file.name}.`);
+    } catch (err) {
+      toast(err.message, true);
+    } finally {
+      e.target.value = "";
+    }
+  });
+}
+wireUpload("file-image", "image");
+wireUpload("file-hover-img", "hover_image");
+wireUpload("file-hero", "hero_image");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(form).entries());
+  try {
+    if (editingSku === null) {
+      await api("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      toast(`Added ${data.sku}.`);
+    } else {
+      await api("/api/products/" + encodeURIComponent(editingSku), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      toast(`Saved ${data.sku}.`);
+    }
+    dialog.close();
+    await load();
+  } catch (err) { toast(err.message, true); }
+});
+
+// --- store info / contact settings ---
+const SETTINGS_KEYS = ["contactEmail", "orderEmail", "phoneDisplay", "phoneTel", "whatsappNumber", "address"];
+async function loadSettings() {
+  const s = await api("/api/settings");
+  for (const k of SETTINGS_KEYS) {
+    const el = $("s-" + k);
+    if (el) el.value = s[k] || "";
+  }
+}
+$("settings-save").addEventListener("click", async () => {
+  const payload = {};
+  for (const k of SETTINGS_KEYS) payload[k] = $("s-" + k).value.trim();
+  try {
+    await api("/api/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    toast("Saved store info.");
+    refreshPublishStatus();
+  } catch (e) {
+    toast(e.message, true);
+  }
+});
+
+load().catch((e) => toast(e.message, true));
+loadSettings().catch((e) => toast(e.message, true));
+</script>
+</body>
+</html>
